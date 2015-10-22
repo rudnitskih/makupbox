@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="210" height="41" viewBox="0 0 210 41"><style><![CDATA[
+.style0 {
+  font-size: 58.3333px;
+  font-family: "BebasNeueLight";
+  fill: rgb(255,255,255);
+}
+.style1 {
+  font-size: 58.3333px;
+  font-family: "BebasNeueBold";
+  fill: rgb(255,255,255);
+}
+]]></style><text transform="translate(-2 40.5)"><tspan x="0.00 47.25 75.37 102.72 131.95 169.69" fill="#FFF" class="style0">MakeUP</tspan><tspan x="200.72 233.91 265.12" fill="#FFF" class="style1">box</tspan></text></svg>
