@@ -17,7 +17,6 @@ var gulp = require('gulp'),
     streamqueue = require('streamqueue'),
     filter = require('gulp-filter'),
     deploy = require('gulp-gh-pages'),
-    pdf = require('phantom-html2pdf'),
     nib = require('nib');
 
 ;
@@ -68,7 +67,7 @@ gulp.task('styles', function() {
       .pipe(stylus({
         use: nib(),
         paths: ['node_modules', 'src/globals'],
-        import: ["nib", "variables"],
+        import: ["nib", "variables", "mixins"],
         compress: true,
         'include css': true
       }))

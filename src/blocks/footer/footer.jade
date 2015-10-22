@@ -1,0 +1,9 @@
+if effects
+	ul.footer__categories
+		each cat in effects
+			li.footer__cat-item
+				unless cat.image
+					- cat.image = "assets/i/" + cat.name + ".png"
+				.footer__cat-icon-container
+					img.footer__cat-icon( src=cat.image )
+				span.footer__cat-name!= cat.name

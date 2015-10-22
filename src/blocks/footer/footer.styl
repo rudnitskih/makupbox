@@ -1,0 +1,28 @@
+.footer
+	fixed bottom left right
+	background-color #232323
+	text-align: center
+	&__categories
+		text-align: center
+		reset-ul()
+	&__cat
+		&-item
+			display: inline-block
+			height 70px
+			width @height
+			cursor pointer
+			transition background-color .2s
+			&:hover
+				background-color #191919
+		&-icon
+			display: inline-block
+			vertical-align top
+			max-width 42px
+			&-container
+				padding-top 6px
+				height 47px
+		&-name
+			display: block
+			font-size 16px
+	
+	

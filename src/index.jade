@@ -1,8 +1,9 @@
 extends ./layouts/root
 
 block root
-	.container
-		header#main
-			include ./blocks/header/header
-		main.main
-			
+	header.header
+		include ./blocks/header/header
+	main.main
+		include ./blocks/main/main
+	footer.footer
+		include ./blocks/footer/footer
