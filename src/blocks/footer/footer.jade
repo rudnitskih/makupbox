@@ -1,9 +1,17 @@
 if effects
-	ul.footer__categories
-		each cat in effects
-			li.footer__cat-item
+	ul.footer__list.active
+		each cat, i in effects
+			li.footer__item.footer__item_cat
 				unless cat.image
 					- cat.image = "assets/i/" + cat.name + ".png"
-				.footer__cat-icon-container
-					img.footer__cat-icon( src=cat.image )
-				span.footer__cat-name!= cat.name
+				.footer__icon-container
+					img.footer__icon( src=cat.image )
+				span.footer__name!= cat.name
+				if cat.childrens
+					script( type="template" name="cat-items-#{i}" )
+						each item in cat.childrens
+							li.footer__item.footer__item_effect
+								unless item.thumb
+									- item.thumb = item.img;
+								img.footer__effect-img( src=item.thumb data-image=item.img )
+

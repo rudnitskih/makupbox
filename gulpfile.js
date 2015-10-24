@@ -36,6 +36,7 @@ gulp.task('scripts',function(){
   streamqueue({ objectMode: true },
     gulp.src(mainBowerFiles())
       .pipe(filter('*.js')),
+    gulp.src('./src/assets/scripts/*.js'),
     gulp.src('./src/assets/scripts/*.coffee')
       .pipe(coffee({bare: true}))
       .on('error', console.log),

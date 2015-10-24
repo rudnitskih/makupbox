@@ -1,0 +1,17 @@
+.main
+	position relative
+	height 100%
+	center-block()
+	&__input
+		absolute top left bottom right
+		width 100%
+		opacity 0
+		cursor pointer
+	&__ask-text
+		font-size 30px
+	&__canvas
+		absolute top left bottom right
+		&.active
+			background-color #191919
+		&:not(.active)
+			display none

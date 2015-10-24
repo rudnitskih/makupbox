@@ -1,7 +1,40 @@
 - name: hair
+  childrens: 
+    - thumb: "assets/i/makeup_thumb.png"
+      img: "assets/i/makeup_thumb.png"
+    - thumb: "assets/i/makeup_thumb.png"
+      img: "assets/i/makeup_thumb.png"
+    - thumb: "assets/i/makeup_thumb.png"
+      img: "assets/i/makeup_thumb.png"
+    - thumb: "assets/i/makeup_thumb.png"
+      img: "assets/i/makeup_thumb.png"
 - name: forehead
+  childrens: 
+  - thumb: "assets/i/makeup_thumb.png"
+    img: "assets/i/makeup_thumb.png"
+  - thumb: "assets/i/makeup_thumb.png"
+    img: "assets/i/makeup_thumb.png"
 - name: eyes
+  childrens: 
+  - thumb: "assets/i/makeup_thumb.png"
+    img: "assets/i/makeup_thumb.png"
+  - thumb: "assets/i/makeup_thumb.png"
+    img: "assets/i/makeup_thumb.png"
 - name: nose
+  childrens: 
+  - thumb: "assets/i/makeup_thumb.png"
+    img: "assets/i/makeup_thumb.png"
+  - thumb: "assets/i/makeup_thumb.png"
+    img: "assets/i/makeup_thumb.png"
+  - thumb: "assets/i/makeup_thumb.png"
+    img: "assets/i/makeup_thumb.png"
+  - thumb: "assets/i/makeup_thumb.png"
+    img: "assets/i/makeup_thumb.png"
 - name: chin
+  childrens: 
+    - thumb: "assets/i/makeup_thumb.png"
+      img: "assets/i/makeup_thumb.png"
+    - thumb: "assets/i/makeup_thumb.png"
+      img: "assets/i/makeup_thumb.png"
 - name: cheeks
 - name: lips 

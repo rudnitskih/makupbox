@@ -1,0 +1,7 @@
+input.main__input( type="file" accept="image/x-png, image/gif, image/jpeg")
+.main__inner
+	- var img = "assets/i/add-photo";
+	img.main__add-photo( src="assets/i/add-photo.png" width="69px" height="69px")
+	.main__ask-text <strong>Click here</strong> to upload your picture
+.main__canvas
+	canvas#photo-editor

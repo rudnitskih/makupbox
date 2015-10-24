@@ -1,5 +1,5 @@
 {
-  "name": "codemotion",
+  "name": "makupbox",
   "version": "1.0.0",
   "dependencies": {
     "connect-livereload": "*",

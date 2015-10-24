@@ -2,27 +2,43 @@
 	fixed bottom left right
 	background-color #232323
 	text-align: center
-	&__categories
+	&__list
 		text-align: center
+		white-space nowrap
+		overflow-x auto
 		reset-ul()
-	&__cat
-		&-item
-			display: inline-block
-			height 70px
-			width @height
-			cursor pointer
-			transition background-color .2s
-			&:hover
-				background-color #191919
-		&-icon
-			display: inline-block
-			vertical-align top
-			max-width 42px
-			&-container
-				padding-top 6px
-				height 47px
-		&-name
-			display: block
-			font-size 16px
+		&:not(.active)
+			display none
+		
+	&__item
+		display: inline-block
+		height 70px
+		width @height
+		cursor pointer
+		transition background-color .2s
+		&:hover
+			background-color #191919
+		&_effect
+		&_back
+			center-block()
+			img
+				max-width 90%
+				max-height 90%
+		&_back
+			background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEgAAABICAQAAAD/5HvMAAAAiUlEQVR4Ae3ZBRGCQRgG4euA0wkiEAZJAkGQFn8XZpkvAG4nuwmek9E3/TkzMzN6rFnRS3nElI6oY5oTJ+oY58SJdnlx4JQX58w8L85Cjhw5cuR8Kzly5MjpZcSJ2NziCLr/ZH5qSZIkSZIkSdKLSZI0y410yG1a2Dq+ZD9PRfTYsKaXzMzMftMFSIymzrvQ4uwAAAAASUVORK5CYII=')
+			background-size 40px
+			background-repeat no-repeat
+			background-position 50%
+
+	&__icon
+		display: inline-block
+		vertical-align top
+		max-width 42px
+		&-container
+			padding-top 6px
+			height 47px
+	&__name
+		display: block
+		font-size 16px
 	
 	
