@@ -659,8 +659,6 @@ window.closest = function(el, fn) {
       this.id = id;
       this.reader = new FileReader();
       this.imgObj = new Image();
-      this.f = fabric.Image.filters;
-      console.log(this.f);
       this.cacheDom();
       this.bindEvents();
     }
@@ -673,6 +671,7 @@ window.closest = function(el, fn) {
     CanvasEditor.prototype.initFabric = function() {
       this.mainWrapper.classList.add('active');
       this.canvas = new fabric.Canvas(this.id);
+      this.f = fabric.Image.filters;
       return this.upperCanvas = this.mainWrapper.querySelector(".upper-canvas");
     };
 
@@ -682,13 +681,16 @@ window.closest = function(el, fn) {
       this.inputImage.addEventListener("change", this.fileAdded.bind(this));
       this.reader.addEventListener("load", (function(_this) {
         return function(e) {
-          return _this.imgObj.src = event.target.result;
+          return _this.imgObj.src = e.target.result;
         };
       })(this));
       return this.imgObj.addEventListener("load", this.imageLoaded.bind(this));
     };
 
     CanvasEditor.prototype.setSizes = function() {
+      if (!this.canvas) {
+        return;
+      }
       this.canvas.setHeight(this.mainWrapper.clientHeight);
       this.canvas.setWidth(this.mainWrapper.clientWidth);
       this.canvas.renderAll();
