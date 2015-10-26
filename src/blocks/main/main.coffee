@@ -3,10 +3,7 @@ class CanvasEditor
 		@id = id
 		@reader = new FileReader()
 		@imgObj = new Image()
-<<<<<<< HEAD
 		@f = fabric.Image.filters
-=======
->>>>>>> 86d610c4322c679db9478c23cdff4645185e5d48
 		@cacheDom()
 		@bindEvents()
 

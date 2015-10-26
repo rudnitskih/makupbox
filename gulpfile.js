@@ -117,10 +117,6 @@ gulp.task('server', function() {
       gulp.start('server');
   });
   gulp.task('default',['watch', 'jade', 'imagemin', "scripts", "styles", "fonts" ]);
-<<<<<<< HEAD
-
-=======
->>>>>>> 86d610c4322c679db9478c23cdff4645185e5d48
     
 gulp.task('deploy', function () {
   return gulp.src("./out/**/*")
