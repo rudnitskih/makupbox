@@ -13,8 +13,17 @@ class Header
 	bindEvents: ->
 		@saveBtn.addEventListener "click", ->
 			CanvasEditor.saveImage()
-		@filtres.addEventListener "click", (e) ->
-			CanvasEditor.applyFilter()
+		@filtres.addEventListener "click", (e) =>
+			filterFunction = e.target.dataset && e.target.dataset.filter
+			num = @whichChild e.target
+			CanvasEditor.applyFilter filterFunction, num
+
+	whichChild: (elem) ->
+		i = 0
+		while((elem=elem.previousSibling)!=null) 
+			++i
+		return i
+
 
 document.addEventListener "DOMContentLoaded", ->
 	new Header "header"

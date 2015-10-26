@@ -3,9 +3,9 @@
 		.header__filters
 			each item in filtres
 				span.header__filters-item( data-filter=item.filter )!= item.name 
-	.header__logo 
+	a.header__logo(href="/" title="MakeupBOX")
 		span.header__logo-text.desktop MakeUP<strong>Box</strong>
 		strong.header__logo-text.mobile MBOX
-	a.header__save( download="my-makeup-photo.jpg" )
+	a.header__save
 		img.header__save-icon(src="assets/i/download.png" height="19" width="15" alt="save") 
 		span.header__save-title save

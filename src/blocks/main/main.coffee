@@ -4,13 +4,13 @@ class CanvasEditor
 		@reader = new FileReader()
 		@imgObj = new Image()
 		@f = fabric.Image.filters
-		console.log @f
 		@cacheDom()
 		@bindEvents()
 
 	cacheDom: ->
 		@mainWrapper = document.querySelector(".main__canvas")
 		@inputImage = document.querySelector(".main__input")
+
 	initFabric: ->
 		@mainWrapper.classList.add 'active'
 		@canvas = new fabric.Canvas @id
@@ -36,20 +36,16 @@ class CanvasEditor
 		if @originalImg
 			cWidth = @canvas.width
 			cHeight = @canvas.height
-			iWidth = @originalImg.width
-			iHeight = @originalImg.height
-			scale = 1
+			iWidth = @oImgSizes.width
+			iHeight = @oImgSizes.height
+			if iWidth > cWidth or iHeight > cHeight
+				@oImgSizes.scale = Math.max( iWidth / cWidth, iHeight / cHeight )
 
-			# console.log cWidth, cHeight, iWidth, iHeight
-			if iWidth > cWidth or iHeight > iHeight
-				scaleX = iWidth / cWidth
-				scaleY = iHeight / cHeight
-				scale = Math.max( scaleY, scaleX )
-				# console.log scaleX,  scaleY
 			@originalImg.set
-				width: iWidth / scale
-				height: iHeight / scale
+				width: iWidth / @oImgSizes.scale
+				height: iHeight / @oImgSizes.scale
 
+			console.log @originalImg
 			@setCenter @originalImg
 			# @canvas.renderAll()
 
@@ -60,6 +56,7 @@ class CanvasEditor
 	imageLoaded: (e) ->
 		@originalImg = new fabric.Image(@imgObj)
 		@lockModification @originalImg
+		@saveImageSizes()
 		@setSizes()
 		@canvas.add @originalImg
 
@@ -88,11 +85,16 @@ class CanvasEditor
 			top: cHeight / 2
 			left: cWidth / 2
 
-	applyFilter: (index, filter) ->
-		obj = @canvas.getActiveObject()
-		return unless obj
-		obj.filters[0] = new @f.Grayscale()
-		obj.applyFilters(@canvas.renderAll.bind(@canvas))
+	applyFilter: (filterString, num) ->
+		@canvas.getObjects().map (obj, i) =>
+			return if i is 0
+			filterFunc = new Function('f', filterString)
+			filterRes = filterFunc(@f)
+			obj.filters[num] = filterRes
+			obj.applyFilters(@canvas.renderAll.bind(@canvas))
+		# obj = @canvas.getActiveObject()
+		# console.log obj, 
+		# return unless obj
 	
 	resizeHandler: ->
 		@setSizes()
@@ -107,6 +109,12 @@ class CanvasEditor
 			hasBorders: false
 			hasRotatingPoint: false
 			selectable: false
+
+	saveImageSizes: ->
+		@oImgSizes =
+			width: @originalImg.width
+			height: @originalImg.height
+			scale: 1
 
 document.addEventListener "DOMContentLoaded", ->
 	setTimeout =>

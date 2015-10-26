@@ -42,7 +42,8 @@ gulp.task('scripts',function(){
       .on('error', console.log),
     gulp.src('./src/blocks/**/*.coffee')
       .pipe(coffee())
-      .on('error', console.log)  
+      .on('error', console.log),
+    gulp.src('./src/blocks/**/*.js')
   ).pipe(concat("project.js"))
   .pipe(gulp.dest('./out/assets/'))
   .pipe(livereload());
@@ -72,7 +73,8 @@ gulp.task('styles', function() {
         compress: true,
         'include css': true
       }))
-      .on('error', console.log)  
+      .on('error', console.log),
+    gulp.src('./src/blocks/**/*.css')
   ).pipe(concat("project.css"))
   .pipe(gulp.dest('./out/assets/'))
   .pipe(livereload());
@@ -116,19 +118,8 @@ gulp.task('server', function() {
   });
   gulp.task('default',['watch', 'jade', 'imagemin', "scripts", "styles", "fonts" ]);
 
-  gulp.task('pdf', function () {
-    createPdf({
-      "html": "./out/index.html",
-      "css": "./out/assets/project.css",
-      "js": "./out/assets/project.js",
-      "paperSize": {
-         delay: 4000
-      }
-    })
-  });
-
     
-gulp.task('deploy', ['pdf'], function () {
+gulp.task('deploy', function () {
   return gulp.src("./out/**/*")
     .pipe(deploy())
 });

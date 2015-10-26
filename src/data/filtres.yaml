@@ -1,6 +1,6 @@
 - name: lq
-  filter: ""
+  filter: "return new f.Noise({noise: 40});"
 - name: filter
   filter: ""
 - name: blur
-  filter: ""
+  filter: "return new f.Convolute({matrix: [ 2/9, 1/9, 1/9, 2/9, 1/9, 1/9, 2/9, 1/9, 1/9 ]});"
