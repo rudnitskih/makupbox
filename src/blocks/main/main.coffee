@@ -3,7 +3,10 @@ class CanvasEditor
 		@id = id
 		@reader = new FileReader()
 		@imgObj = new Image()
+<<<<<<< HEAD
 		@f = fabric.Image.filters
+=======
+>>>>>>> 86d610c4322c679db9478c23cdff4645185e5d48
 		@cacheDom()
 		@bindEvents()
 
@@ -14,6 +17,7 @@ class CanvasEditor
 	initFabric: ->
 		@mainWrapper.classList.add 'active'
 		@canvas = new fabric.Canvas @id
+		@f = fabric.Image.filters
 		@upperCanvas = @mainWrapper.querySelector ".upper-canvas"
 
 	bindEvents: ->
@@ -21,11 +25,12 @@ class CanvasEditor
 		window.addEventListener "saveImage", @saveImage.bind(@)
 		@inputImage.addEventListener "change", @fileAdded.bind(@)
 		@reader.addEventListener "load", (e) =>
-			@imgObj.src = event.target.result
+			@imgObj.src = e.target.result
 		@imgObj.addEventListener "load", @imageLoaded.bind(@)
 
 		
 	setSizes: ->
+		return unless @canvas
 		@canvas.setHeight @mainWrapper.clientHeight
 		@canvas.setWidth @mainWrapper.clientWidth
 		@canvas.renderAll()

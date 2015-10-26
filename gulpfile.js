@@ -117,7 +117,10 @@ gulp.task('server', function() {
       gulp.start('server');
   });
   gulp.task('default',['watch', 'jade', 'imagemin', "scripts", "styles", "fonts" ]);
+<<<<<<< HEAD
 
+=======
+>>>>>>> 86d610c4322c679db9478c23cdff4645185e5d48
     
 gulp.task('deploy', function () {
   return gulp.src("./out/**/*")
@@ -135,13 +138,4 @@ function combineJSONFiles(dir) {
     };
     
     return data;
-}
-
-function createPdf(options){
-  pdf.convert(options, function(result) {
-    result.toBuffer(function(returnedBuffer) {});
-    var stream = result.toStream();
-    var tmpPath = result.getTmpPath();
-    result.toFile("./out/SV_Frontend_Rudnytskykh.pdf", function() {});
-  });
 }
