@@ -10,15 +10,16 @@ class CanvasEditor
 	cacheDom: ->
 		@mainWrapper = document.querySelector(".main__canvas")
 		@inputImage = document.querySelector(".main__input")
+		@ogTags = document.querySelectorAll("meta[name='twitter:image'], meta[itemprop='image'], meta[property='og:image']")
 
 	initFabric: ->
 		@mainWrapper.classList.add 'active'
 		@canvas = new fabric.Canvas @id
 		@f = fabric.Image.filters
 		@upperCanvas = @mainWrapper.querySelector ".upper-canvas"
+		@canvas.on "after:render", debounce @setOGTags.bind(@), 200
 
 	bindEvents: ->
-		window.addEventListener "resize", @resizeHandler.bind(@)
 		window.addEventListener "saveImage", @saveImage.bind(@)
 		@inputImage.addEventListener "change", @fileAdded.bind(@)
 		@reader.addEventListener "load", (e) =>
@@ -47,9 +48,7 @@ class CanvasEditor
 				width: iWidth / @oImgSizes.scale
 				height: iHeight / @oImgSizes.scale
 
-			console.log @originalImg
 			@setCenter @originalImg
-			# @canvas.renderAll()
 
 	fileAdded: (e) ->
 		@initFabric()
@@ -65,14 +64,21 @@ class CanvasEditor
 	saveImage: ->
 		return unless @canvas
 		if fabric.Canvas.supports('toDataURL')
-			window.open @canvas.toDataURL('jpg')
+			window.open canvas2img()
 		else
 			alert "Sorry but you browser not support saving image from canvas"
 
+	setOGTags: ->
+		if fabric.Canvas.supports('toDataURL') and @ogTags
+
+			[].forEach.call @ogTags, (item) =>
+				item.content = @canvas2img()
+
+	canvas2img: -> 
+		@canvas.toDataURL("image/jpeg")
+
 	addEffect: (image) ->
 		return unless @canvas
-		# unless @canvas
-		# 	@initFabric()
 		fabric.Image.fromURL image, (oImg) =>
 			@setCenter oImg
 			@canvas.add oImg
@@ -94,9 +100,6 @@ class CanvasEditor
 			filterRes = filterFunc(@f)
 			obj.filters[num] = filterRes
 			obj.applyFilters(@canvas.renderAll.bind(@canvas))
-		# obj = @canvas.getActiveObject()
-		# console.log obj, 
-		# return unless obj
 	
 	resizeHandler: ->
 		@setSizes()

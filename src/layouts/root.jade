@@ -4,6 +4,32 @@ html
 		meta(charset="UTF-8")
 		meta(content="width=device-width, minimum-scale=1, maximum-scale=1" name="viewport")
 		meta(name="format-detection", content="telephone=no")
+		meta(name="author", content="SE7ENSKY frontend studio <hello@se7ensky.com>")
+		title #{site.title}
+				
+		meta(name="keywords" content="#{site.keywords}")
+		meta(name="description", content="#{site.description}")
+
+		//- Schema.org markup for Google+
+		meta(itemprop="name", content="#{site.title}")
+		meta(itemprop="description", content="#{site.description}")
+		meta(itemprop="image")
+
+		//- Twitter Card data
+		meta(name="twitter:card", content="product")
+		meta(name="twitter:site", content="#{site.twitter}")
+		meta(name="twitter:title", content="#{site.title}")
+		meta(name="twitter:description", content="#{site.description}")
+		meta(name="twitter:image")
+
+		//- Open Graph data
+		meta(property="og:title", content="#{site.title}")
+		meta(property="og:type", content="article")
+		meta(property="og:url", content="#{site.url}")
+		meta(property="og:image")
+		meta(property="og:description", content="#{site.description}")
+		meta(property="og:site_name", content="#{site.name}")
+
 		title
 			block title
 		block fonts
