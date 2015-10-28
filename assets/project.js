@@ -510,61 +510,48 @@ if (objCtr.defineProperty) {
 
 }
 
+var debounce, throttle;
+
 window.closest = function(el, fn) {
   return el && (fn(el) ? el : closest(el.parentNode, fn));
 };
 
-(function() {
-  var Header;
+window.debounce = debounce = function(fn, delay) {
+  var timer;
+  timer = null;
+  return function() {
+    var args, context;
+    context = this;
+    args = arguments;
+    clearTimeout(timer);
+    return timer = setTimeout(function() {
+      return fn.apply(context, args);
+    }, delay);
+  };
+};
 
-  Header = (function() {
-    function Header(blockName) {
-      this.blockName = blockName;
-      this.block = document.querySelector("." + this.blockName);
-      if (!this.block) {
-        return;
-      }
-      this.cacheDom();
-      this.bindEvents();
+window.throttle = throttle = function(fn, threshhold, scope) {
+  var deferTimer, last;
+  threshhold || (threshhold = 250);
+  last = void 0;
+  deferTimer = void 0;
+  return function() {
+    var args, context, now;
+    context = scope || this;
+    now = +(new Date);
+    args = arguments;
+    if (last && now < last + threshhold) {
+      clearTimeout(deferTimer);
+      return deferTimer = setTimeout(function() {
+        last = now;
+        return fn.apply(context, args);
+      }, threshhold);
+    } else {
+      last = now;
+      return fn.apply(context, args);
     }
-
-    Header.prototype.cacheDom = function() {
-      this.saveBtn = this.block.querySelector(".header__save");
-      return this.filtres = this.block.querySelector(".header__filters");
-    };
-
-    Header.prototype.bindEvents = function() {
-      this.saveBtn.addEventListener("click", function() {
-        return CanvasEditor.saveImage();
-      });
-      return this.filtres.addEventListener("click", (function(_this) {
-        return function(e) {
-          var filterFunction, num;
-          filterFunction = e.target.dataset && e.target.dataset.filter;
-          num = _this.whichChild(e.target);
-          return CanvasEditor.applyFilter(filterFunction, num);
-        };
-      })(this));
-    };
-
-    Header.prototype.whichChild = function(elem) {
-      var i;
-      i = 0;
-      while ((elem = elem.previousSibling) !== null) {
-        ++i;
-      }
-      return i;
-    };
-
-    return Header;
-
-  })();
-
-  document.addEventListener("DOMContentLoaded", function() {
-    return new Header("header");
-  });
-
-}).call(this);
+  };
+};
 
 (function() {
   var Footer;
@@ -666,6 +653,72 @@ window.closest = function(el, fn) {
 }).call(this);
 
 (function() {
+  var Header;
+
+  Header = (function() {
+    function Header(blockName) {
+      this.blockName = blockName;
+      this.block = document.querySelector("." + this.blockName);
+      if (!this.block) {
+        return;
+      }
+      this.cacheDom();
+      this.bindEvents();
+    }
+
+    Header.prototype.cacheDom = function() {
+      this.saveBtn = this.block.querySelector(".header__save");
+      return this.filtres = this.block.querySelector(".header__filters");
+    };
+
+    Header.prototype.bindEvents = function() {
+      this.saveBtn.addEventListener("click", function() {
+        return CanvasEditor.saveImage();
+      });
+      return this.filtres.addEventListener("click", (function(_this) {
+        return function(e) {
+          var filterFunction, num;
+          filterFunction = e.target.dataset && e.target.dataset.filter;
+          num = _this.whichChild(e.target);
+          return CanvasEditor.applyFilter(filterFunction, num);
+        };
+      })(this));
+    };
+
+    Header.prototype.whichChild = function(elem) {
+      var i;
+      i = 0;
+      while ((elem = elem.previousSibling) !== null) {
+        ++i;
+      }
+      return i;
+    };
+
+    return Header;
+
+  })();
+
+  document.addEventListener("DOMContentLoaded", function() {
+    return new Header("header");
+  });
+
+}).call(this);
+
+(function() {
+  document.addEventListener("DOMContentLoaded", function() {
+    var likely;
+    likely = document.querySelector(".likely");
+    if (likely) {
+      return likely.addEventListener("click", function(e) {
+        e.preventDefault();
+        return CanvasEditor.setOGTags();
+      });
+    }
+  });
+
+}).call(this);
+
+(function() {
   var CanvasEditor;
 
   CanvasEditor = (function() {
@@ -680,18 +733,19 @@ window.closest = function(el, fn) {
 
     CanvasEditor.prototype.cacheDom = function() {
       this.mainWrapper = document.querySelector(".main__canvas");
-      return this.inputImage = document.querySelector(".main__input");
+      this.inputImage = document.querySelector(".main__input");
+      return this.ogTags = document.querySelectorAll("meta[name='twitter:image'], meta[itemprop='image'], meta[property='og:image']");
     };
 
     CanvasEditor.prototype.initFabric = function() {
       this.mainWrapper.classList.add('active');
       this.canvas = new fabric.Canvas(this.id);
       this.f = fabric.Image.filters;
-      return this.upperCanvas = this.mainWrapper.querySelector(".upper-canvas");
+      this.upperCanvas = this.mainWrapper.querySelector(".upper-canvas");
+      return this.canvas.on("after:render", debounce(this.setOGTags.bind(this), 200));
     };
 
     CanvasEditor.prototype.bindEvents = function() {
-      window.addEventListener("resize", this.resizeHandler.bind(this));
       window.addEventListener("saveImage", this.saveImage.bind(this));
       this.inputImage.addEventListener("change", this.fileAdded.bind(this));
       this.reader.addEventListener("load", (function(_this) {
@@ -728,7 +782,6 @@ window.closest = function(el, fn) {
           width: iWidth / this.oImgSizes.scale,
           height: iHeight / this.oImgSizes.scale
         });
-        console.log(this.originalImg);
         return this.setCenter(this.originalImg);
       }
     };
@@ -751,10 +804,24 @@ window.closest = function(el, fn) {
         return;
       }
       if (fabric.Canvas.supports('toDataURL')) {
-        return window.open(this.canvas.toDataURL('jpg'));
+        return window.open(canvas2img());
       } else {
         return alert("Sorry but you browser not support saving image from canvas");
       }
+    };
+
+    CanvasEditor.prototype.setOGTags = function() {
+      if (fabric.Canvas.supports('toDataURL') && this.ogTags) {
+        return [].forEach.call(this.ogTags, (function(_this) {
+          return function(item) {
+            return item.content = _this.canvas2img();
+          };
+        })(this));
+      }
+    };
+
+    CanvasEditor.prototype.canvas2img = function() {
+      return this.canvas.toDataURL("image/jpeg");
     };
 
     CanvasEditor.prototype.addEffect = function(image) {
