@@ -15,7 +15,7 @@ class Footer
 		@block.addEventListener "click", @blockClickHandler.bind(@)
 
 	blockClickHandler: (e) ->
-
+		e ?= window.event
 		itemCat = closest e.target, (el) =>
 			@hasClass el, "footer__item_cat"
 		itemBack = closest e.target, (el) =>

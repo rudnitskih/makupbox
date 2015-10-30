@@ -8,6 +8,7 @@ class CanvasEditor
 		@bindEvents()
 
 	cacheDom: ->
+		@main = document.querySelector(".main")
 		@mainWrapper = document.querySelector(".main__canvas")
 		@inputImage = document.querySelector(".main__input")
 		@ogTags = document.querySelectorAll("meta[name='twitter:image'], meta[itemprop='image'], meta[property='og:image']")
@@ -15,6 +16,8 @@ class CanvasEditor
 	initFabric: ->
 		@mainWrapper.classList.add 'active'
 		@canvas = new fabric.Canvas @id
+		@canvas.setHeight(@oImgSizes.height)
+		@canvas.setWidth(@oImgSizes.width)
 		@f = fabric.Image.filters
 		@upperCanvas = @mainWrapper.querySelector ".upper-canvas"
 		@canvas.on "after:render", debounce @setOGTags.bind(@), 200
@@ -23,9 +26,9 @@ class CanvasEditor
 		window.addEventListener "saveImage", @saveImage.bind(@)
 		@inputImage.addEventListener "change", @fileAdded.bind(@)
 		@reader.addEventListener "load", (e) =>
+			e ?= window.event
 			@imgObj.src = e.target.result
 		@imgObj.addEventListener "load", @imageLoaded.bind(@)
-
 		
 	setSizes: ->
 		return unless @canvas
@@ -34,6 +37,8 @@ class CanvasEditor
 		@canvas.renderAll()
 		if @originalImg
 			@setImageSize()
+			@canvas.setHeight(@originalImg.height)
+			@canvas.setWidth(@originalImg.width)
 
 	setImageSize: ->
 		if @originalImg
@@ -48,29 +53,30 @@ class CanvasEditor
 				width: iWidth / @oImgSizes.scale
 				height: iHeight / @oImgSizes.scale
 
-			@setCenter @originalImg
+			# @setCenter @originalImg
 
 	fileAdded: (e) ->
-		@initFabric()
+		e ?= window.event
 		@reader.readAsDataURL(e.target.files[0])
+		@main.classList.add "image-added"
 
-	imageLoaded: (e) ->
+	imageLoaded: ->
 		@originalImg = new fabric.Image(@imgObj)
-		@lockModification @originalImg
 		@saveImageSizes()
+		@lockModification @originalImg
+		@initFabric()
 		@setSizes()
 		@canvas.add @originalImg
 
 	saveImage: ->
 		return unless @canvas
 		if fabric.Canvas.supports('toDataURL')
-			window.open canvas2img()
+			window.open @canvas2img()
 		else
 			alert "Sorry but you browser not support saving image from canvas"
 
 	setOGTags: ->
 		if fabric.Canvas.supports('toDataURL') and @ogTags
-
 			[].forEach.call @ogTags, (item) =>
 				item.content = @canvas2img()
 

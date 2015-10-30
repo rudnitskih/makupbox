@@ -10,8 +10,15 @@
 	&__ask-text
 		font-size 30px
 	&__canvas
-		absolute top left bottom right
+		width 95%
+		height 100%
+		vertical-center()
 		&.active
 			background-color #191919
 		&:not(.active)
+			display none
+		.canvas-container
+			margin 0 auto
+	&.image-added
+		.main__inner
 			display none
