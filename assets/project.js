@@ -579,6 +579,9 @@ window.throttle = throttle = function(fn, threshhold, scope) {
 
     Footer.prototype.blockClickHandler = function(e) {
       var itemBack, itemCat, itemEffect;
+      if (e == null) {
+        e = window.event;
+      }
       itemCat = closest(e.target, (function(_this) {
         return function(el) {
           return _this.hasClass(el, "footer__item_cat");
@@ -678,6 +681,9 @@ window.throttle = throttle = function(fn, threshhold, scope) {
       return this.filtres.addEventListener("click", (function(_this) {
         return function(e) {
           var filterFunction, num;
+          if (e == null) {
+            e = window.event;
+          }
           filterFunction = e.target.dataset && e.target.dataset.filter;
           num = _this.whichChild(e.target);
           return CanvasEditor.applyFilter(filterFunction, num);
@@ -705,20 +711,6 @@ window.throttle = throttle = function(fn, threshhold, scope) {
 }).call(this);
 
 (function() {
-  document.addEventListener("DOMContentLoaded", function() {
-    var likely;
-    likely = document.querySelector(".likely");
-    if (likely) {
-      return likely.addEventListener("click", function(e) {
-        e.preventDefault();
-        return CanvasEditor.setOGTags();
-      });
-    }
-  });
-
-}).call(this);
-
-(function() {
   var CanvasEditor;
 
   CanvasEditor = (function() {
@@ -732,6 +724,7 @@ window.throttle = throttle = function(fn, threshhold, scope) {
     }
 
     CanvasEditor.prototype.cacheDom = function() {
+      this.main = document.querySelector(".main");
       this.mainWrapper = document.querySelector(".main__canvas");
       this.inputImage = document.querySelector(".main__input");
       return this.ogTags = document.querySelectorAll("meta[name='twitter:image'], meta[itemprop='image'], meta[property='og:image']");
@@ -740,6 +733,8 @@ window.throttle = throttle = function(fn, threshhold, scope) {
     CanvasEditor.prototype.initFabric = function() {
       this.mainWrapper.classList.add('active');
       this.canvas = new fabric.Canvas(this.id);
+      this.canvas.setHeight(this.oImgSizes.height);
+      this.canvas.setWidth(this.oImgSizes.width);
       this.f = fabric.Image.filters;
       this.upperCanvas = this.mainWrapper.querySelector(".upper-canvas");
       return this.canvas.on("after:render", debounce(this.setOGTags.bind(this), 200));
@@ -750,6 +745,9 @@ window.throttle = throttle = function(fn, threshhold, scope) {
       this.inputImage.addEventListener("change", this.fileAdded.bind(this));
       this.reader.addEventListener("load", (function(_this) {
         return function(e) {
+          if (e == null) {
+            e = window.event;
+          }
           return _this.imgObj.src = e.target.result;
         };
       })(this));
@@ -764,7 +762,9 @@ window.throttle = throttle = function(fn, threshhold, scope) {
       this.canvas.setWidth(this.mainWrapper.clientWidth);
       this.canvas.renderAll();
       if (this.originalImg) {
-        return this.setImageSize();
+        this.setImageSize();
+        this.canvas.setHeight(this.originalImg.height);
+        return this.canvas.setWidth(this.originalImg.width);
       }
     };
 
@@ -778,23 +778,26 @@ window.throttle = throttle = function(fn, threshhold, scope) {
         if (iWidth > cWidth || iHeight > cHeight) {
           this.oImgSizes.scale = Math.max(iWidth / cWidth, iHeight / cHeight);
         }
-        this.originalImg.set({
+        return this.originalImg.set({
           width: iWidth / this.oImgSizes.scale,
           height: iHeight / this.oImgSizes.scale
         });
-        return this.setCenter(this.originalImg);
       }
     };
 
     CanvasEditor.prototype.fileAdded = function(e) {
-      this.initFabric();
-      return this.reader.readAsDataURL(e.target.files[0]);
+      if (e == null) {
+        e = window.event;
+      }
+      this.reader.readAsDataURL(e.target.files[0]);
+      return this.main.classList.add("image-added");
     };
 
-    CanvasEditor.prototype.imageLoaded = function(e) {
+    CanvasEditor.prototype.imageLoaded = function() {
       this.originalImg = new fabric.Image(this.imgObj);
-      this.lockModification(this.originalImg);
       this.saveImageSizes();
+      this.lockModification(this.originalImg);
+      this.initFabric();
       this.setSizes();
       return this.canvas.add(this.originalImg);
     };
@@ -804,7 +807,7 @@ window.throttle = throttle = function(fn, threshhold, scope) {
         return;
       }
       if (fabric.Canvas.supports('toDataURL')) {
-        return window.open(canvas2img());
+        return window.open(this.canvas2img());
       } else {
         return alert("Sorry but you browser not support saving image from canvas");
       }
@@ -899,6 +902,20 @@ window.throttle = throttle = function(fn, threshhold, scope) {
         return window.CanvasEditor = new CanvasEditor("photo-editor");
       };
     })(this), 0);
+  });
+
+}).call(this);
+
+(function() {
+  document.addEventListener("DOMContentLoaded", function() {
+    var likely;
+    likely = document.querySelector(".likely");
+    if (likely) {
+      return likely.addEventListener("click", function(e) {
+        e.preventDefault();
+        return CanvasEditor.setOGTags();
+      });
+    }
   });
 
 }).call(this);
