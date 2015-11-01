@@ -30,7 +30,7 @@
   <body>
     <header class="header">
       <div class="container">
-        <div class="header__filters"><span data-filter="return new f.Noise({noise: 40});" class="header__filters-item">lq</span><span data-filter="" class="header__filters-item">filter</span><span data-filter="return new f.Convolute({matrix: [ 2/9, 1/9, 1/9, 2/9, 1/9, 1/9, 2/9, 1/9, 1/9 ]});" class="header__filters-item">blur</span>
+        <div class="header__filters"><span data-filter="return new f.Noise({noise: 40});" class="header__filters-item">lq</span><span data-filter="return new f.BrightnessContrast({contrast:0.5,brightness:100}) //contrast from -1 to 1; brightness from 0 to 100" class="header__filters-item">filter</span><span data-filter="return new f.Convolute({matrix: [ 2/9, 1/9, 1/9, 2/9, 1/9, 1/9, 2/9, 1/9, 1/9 ]});" class="header__filters-item">blur</span>
         </div><a href="/" title="MakeupBOX" class="header__logo"><span class="header__logo-text desktop">MakeUP<strong>Box</strong></span><strong class="header__logo-text mobile">MBOX</strong></a><a class="header__save"><img src="assets/i/download.png" height="19" width="15" alt="save" class="header__save-icon"><span class="header__save-title">save</span></a>
       </div>
     </header>
@@ -39,7 +39,7 @@
       <div class="main__inner"><img src="assets/i/add-photo.png" width="69px" height="69px" class="main__add-photo">
         <div class="main__ask-text"><strong>Click here</strong> to upload your picture</div>
       </div>
-      <div class="main__canvas">
+      <div data-watermark="/assets/i/add-photo.png" class="main__canvas">
         <canvas id="photo-editor"></canvas>
         <div class="main__likes">
           <div class="likely likely-light">

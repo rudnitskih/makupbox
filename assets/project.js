@@ -510,6 +510,65 @@ if (objCtr.defineProperty) {
 
 }
 
+fabric.Image.filters.BrightnessContrast = fabric.util.createClass(fabric.Image.filters.BaseFilter, {
+  type: 'BrightnessContrast',
+  initialize: function(options) {
+    options || (options = { });
+    this.contrast = options.contrast || 0;
+    this.brightness = options.brightness || 0;
+  },
+
+  applyTo: function(canvasEl) {
+      var brightMul = 1 + Math.min(150,Math.max(-150,this.brightness)) / 150,
+          contrast = Math.max(0,this.contrast+1),
+          context = canvasEl.getContext('2d'),
+          imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height),
+          data = imageData.data,
+          p = canvasEl.width * canvasEl.height,
+          pix = p*4, pix1, pix2, mul, add, r, g, b;
+
+      if (contrast != -1) {
+         mul = brightMul * contrast;
+         add = - contrast * 128 + 128;
+      }
+      else {
+         mul = brightMul;
+         add = 0;
+      }
+
+      while (p--) {
+         if ((r = data[pix-=4] * mul + add) > 255 )
+            data[pix] = 255;
+         else if (r < 0)
+            data[pix] = 0;
+         else
+            data[pix] = r;
+
+         if ((g = data[pix1=pix+1] * mul + add) > 255 )
+            data[pix1] = 255;
+         else if (g < 0)
+            data[pix1] = 0;
+         else
+            data[pix1] = g;
+
+         if ((b = data[pix2=pix+2] * mul + add) > 255 )
+            data[pix2] = 255;
+         else if (b < 0)
+            data[pix2] = 0;
+         else
+            data[pix2] = b;
+      }
+
+      context.putImageData(imageData, 0, 0);
+  },
+
+toObject: function() {
+    return extend(this.callSuper('toObject'), {
+       contrast: this.contrast,
+       brightness: this.brightness
+    });
+  }
+});
 var debounce, throttle;
 
 window.closest = function(el, fn) {
@@ -676,7 +735,8 @@ window.throttle = throttle = function(fn, threshhold, scope) {
 
     Header.prototype.bindEvents = function() {
       this.saveBtn.addEventListener("click", function() {
-        return CanvasEditor.saveImage();
+        CanvasEditor.saveImage();
+        return console.log("saveImage");
       });
       return this.filtres.addEventListener("click", (function(_this) {
         return function(e) {
@@ -711,6 +771,20 @@ window.throttle = throttle = function(fn, threshhold, scope) {
 }).call(this);
 
 (function() {
+  document.addEventListener("DOMContentLoaded", function() {
+    var likely;
+    likely = document.querySelector(".likely");
+    if (likely) {
+      return likely.addEventListener("click", function(e) {
+        e.preventDefault();
+        return CanvasEditor.setOGTags();
+      });
+    }
+  });
+
+}).call(this);
+
+(function() {
   var CanvasEditor;
 
   CanvasEditor = (function() {
@@ -726,6 +800,7 @@ window.throttle = throttle = function(fn, threshhold, scope) {
     CanvasEditor.prototype.cacheDom = function() {
       this.main = document.querySelector(".main");
       this.mainWrapper = document.querySelector(".main__canvas");
+      this.watermarkImg = this.mainWrapper.dataset.watermark;
       this.inputImage = document.querySelector(".main__input");
       return this.ogTags = document.querySelectorAll("meta[name='twitter:image'], meta[itemprop='image'], meta[property='og:image']");
     };
@@ -736,12 +811,10 @@ window.throttle = throttle = function(fn, threshhold, scope) {
       this.canvas.setHeight(this.oImgSizes.height);
       this.canvas.setWidth(this.oImgSizes.width);
       this.f = fabric.Image.filters;
-      this.upperCanvas = this.mainWrapper.querySelector(".upper-canvas");
-      return this.canvas.on("after:render", debounce(this.setOGTags.bind(this), 200));
+      return this.upperCanvas = this.mainWrapper.querySelector(".upper-canvas");
     };
 
     CanvasEditor.prototype.bindEvents = function() {
-      window.addEventListener("saveImage", this.saveImage.bind(this));
       this.inputImage.addEventListener("change", this.fileAdded.bind(this));
       this.reader.addEventListener("load", (function(_this) {
         return function(e) {
@@ -758,8 +831,8 @@ window.throttle = throttle = function(fn, threshhold, scope) {
       if (!this.canvas) {
         return;
       }
-      this.canvas.setHeight(this.mainWrapper.clientHeight);
-      this.canvas.setWidth(this.mainWrapper.clientWidth);
+      this.canvas.setHeight(this.mainWrapper.clientHeight - 2);
+      this.canvas.setWidth(this.mainWrapper.clientWidth - 2);
       this.canvas.renderAll();
       if (this.originalImg) {
         this.setImageSize();
@@ -796,35 +869,42 @@ window.throttle = throttle = function(fn, threshhold, scope) {
     CanvasEditor.prototype.imageLoaded = function() {
       this.originalImg = new fabric.Image(this.imgObj);
       this.saveImageSizes();
-      this.lockModification(this.originalImg);
+      this.originalImg.selectable = false;
       this.initFabric();
       this.setSizes();
-      return this.canvas.add(this.originalImg);
+      this.canvas.add(this.originalImg);
+      return this.addWatermark();
     };
 
     CanvasEditor.prototype.saveImage = function() {
+      var img, win;
       if (!this.canvas) {
         return;
       }
       if (fabric.Canvas.supports('toDataURL')) {
-        return window.open(this.canvas2img());
+        img = this.canvas2img();
+        win = window.open();
+        win.document.body.innerHTML = "<img src='" + img + "'></img>";
+        return win.document.close();
       } else {
         return alert("Sorry but you browser not support saving image from canvas");
       }
     };
 
     CanvasEditor.prototype.setOGTags = function() {
+      var base64;
       if (fabric.Canvas.supports('toDataURL') && this.ogTags) {
+        base64 = this.canvas2img();
         return [].forEach.call(this.ogTags, (function(_this) {
           return function(item) {
-            return item.content = _this.canvas2img();
+            return item.content = base64;
           };
         })(this));
       }
     };
 
     CanvasEditor.prototype.canvas2img = function() {
-      return this.canvas.toDataURL("image/jpeg");
+      return this.canvas.toDataURL("image/jpeg;base64;");
     };
 
     CanvasEditor.prototype.addEffect = function(image) {
@@ -867,29 +947,29 @@ window.throttle = throttle = function(fn, threshhold, scope) {
       })(this));
     };
 
-    CanvasEditor.prototype.resizeHandler = function() {
-      return this.setSizes();
-    };
-
-    CanvasEditor.prototype.lockModification = function(el) {
-      return el.set({
-        lockMovementX: true,
-        lockMovementY: true,
-        lockUniScaling: true,
-        lockRotation: true,
-        hasControls: false,
-        hasBorders: false,
-        hasRotatingPoint: false,
-        selectable: false
-      });
-    };
-
     CanvasEditor.prototype.saveImageSizes = function() {
       return this.oImgSizes = {
         width: this.originalImg.width,
         height: this.originalImg.height,
         scale: 1
       };
+    };
+
+    CanvasEditor.prototype.addWatermark = function() {
+      return fabric.Image.fromURL(this.watermarkImg, (function(_this) {
+        return function(img) {
+          img.selectable = false;
+          img.set({
+            originX: 'center',
+            originY: 'center',
+            left: _this.canvas.width - 50,
+            top: _this.canvas.height - 50,
+            width: 50,
+            height: 50
+          });
+          return _this.canvas.add(img);
+        };
+      })(this));
     };
 
     return CanvasEditor;
@@ -902,20 +982,6 @@ window.throttle = throttle = function(fn, threshhold, scope) {
         return window.CanvasEditor = new CanvasEditor("photo-editor");
       };
     })(this), 0);
-  });
-
-}).call(this);
-
-(function() {
-  document.addEventListener("DOMContentLoaded", function() {
-    var likely;
-    likely = document.querySelector(".likely");
-    if (likely) {
-      return likely.addEventListener("click", function(e) {
-        e.preventDefault();
-        return CanvasEditor.setOGTags();
-      });
-    }
   });
 
 }).call(this);
