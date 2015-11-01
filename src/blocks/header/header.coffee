@@ -13,6 +13,7 @@ class Header
 	bindEvents: ->
 		@saveBtn.addEventListener "click", ->
 			CanvasEditor.saveImage()
+			console.log "saveImage"
 		@filtres.addEventListener "click", (e) =>
 			e ?= window.event
 			filterFunction = e.target.dataset && e.target.dataset.filter

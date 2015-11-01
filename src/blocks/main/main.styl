@@ -4,6 +4,7 @@
 	center-block()
 	&__input
 		absolute top left bottom right
+		height 100%
 		width 100%
 		opacity 0
 		cursor pointer
@@ -20,5 +21,8 @@
 		.canvas-container
 			margin 0 auto
 	&.image-added
-		.main__inner
-			display none
+		.main
+			&__inner
+			&__input
+				display none
+				

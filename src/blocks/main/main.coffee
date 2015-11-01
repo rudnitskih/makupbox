@@ -10,6 +10,7 @@ class CanvasEditor
 	cacheDom: ->
 		@main = document.querySelector(".main")
 		@mainWrapper = document.querySelector(".main__canvas")
+		@watermarkImg = @mainWrapper.dataset.watermark
 		@inputImage = document.querySelector(".main__input")
 		@ogTags = document.querySelectorAll("meta[name='twitter:image'], meta[itemprop='image'], meta[property='og:image']")
 
@@ -20,10 +21,9 @@ class CanvasEditor
 		@canvas.setWidth(@oImgSizes.width)
 		@f = fabric.Image.filters
 		@upperCanvas = @mainWrapper.querySelector ".upper-canvas"
-		@canvas.on "after:render", debounce @setOGTags.bind(@), 200
+		# @canvas.on "after:render", debounce @setOGTags.bind(@), 2000
 
 	bindEvents: ->
-		window.addEventListener "saveImage", @saveImage.bind(@)
 		@inputImage.addEventListener "change", @fileAdded.bind(@)
 		@reader.addEventListener "load", (e) =>
 			e ?= window.event
@@ -32,8 +32,8 @@ class CanvasEditor
 		
 	setSizes: ->
 		return unless @canvas
-		@canvas.setHeight @mainWrapper.clientHeight
-		@canvas.setWidth @mainWrapper.clientWidth
+		@canvas.setHeight @mainWrapper.clientHeight - 2
+		@canvas.setWidth @mainWrapper.clientWidth - 2
 		@canvas.renderAll()
 		if @originalImg
 			@setImageSize()
@@ -53,8 +53,6 @@ class CanvasEditor
 				width: iWidth / @oImgSizes.scale
 				height: iHeight / @oImgSizes.scale
 
-			# @setCenter @originalImg
-
 	fileAdded: (e) ->
 		e ?= window.event
 		@reader.readAsDataURL(e.target.files[0])
@@ -63,25 +61,30 @@ class CanvasEditor
 	imageLoaded: ->
 		@originalImg = new fabric.Image(@imgObj)
 		@saveImageSizes()
-		@lockModification @originalImg
+		@originalImg.selectable = false
 		@initFabric()
 		@setSizes()
 		@canvas.add @originalImg
+		@addWatermark()
 
 	saveImage: ->
 		return unless @canvas
 		if fabric.Canvas.supports('toDataURL')
-			window.open @canvas2img()
+			img = @canvas2img()
+			win = window.open()
+			win.document.body.innerHTML = "<img src='" + img + "'></img>"
+			win.document.close()			
 		else
 			alert "Sorry but you browser not support saving image from canvas"
 
 	setOGTags: ->
 		if fabric.Canvas.supports('toDataURL') and @ogTags
+			base64 = @canvas2img()
 			[].forEach.call @ogTags, (item) =>
-				item.content = @canvas2img()
+				item.content = base64
 
 	canvas2img: -> 
-		@canvas.toDataURL("image/jpeg")
+		@canvas.toDataURL("image/jpeg;base64;")
 
 	addEffect: (image) ->
 		return unless @canvas
@@ -106,26 +109,24 @@ class CanvasEditor
 			filterRes = filterFunc(@f)
 			obj.filters[num] = filterRes
 			obj.applyFilters(@canvas.renderAll.bind(@canvas))
-	
-	resizeHandler: ->
-		@setSizes()
-
-	lockModification: (el) ->
-		el.set
-			lockMovementX: true
-			lockMovementY: true
-			lockUniScaling: true
-			lockRotation: true
-			hasControls: false
-			hasBorders: false
-			hasRotatingPoint: false
-			selectable: false
 
 	saveImageSizes: ->
 		@oImgSizes =
 			width: @originalImg.width
 			height: @originalImg.height
 			scale: 1
+
+	addWatermark: ->
+		fabric.Image.fromURL @watermarkImg, (img) =>
+			img.selectable = false
+			img.set
+				originX: 'center'
+				originY: 'center'
+				left: @canvas.width - 50
+				top: @canvas.height - 50
+				width: 50
+				height: 50
+			@canvas.add img
 
 document.addEventListener "DOMContentLoaded", ->
 	setTimeout =>
