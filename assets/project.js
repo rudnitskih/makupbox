@@ -795,6 +795,7 @@ window.throttle = throttle = function(fn, threshhold, scope) {
       this.f = fabric.Image.filters;
       this.cacheDom();
       this.bindEvents();
+      this.configFabricCtrl();
     }
 
     CanvasEditor.prototype.cacheDom = function() {
@@ -802,7 +803,8 @@ window.throttle = throttle = function(fn, threshhold, scope) {
       this.mainWrapper = document.querySelector(".main__canvas");
       this.watermarkImg = this.mainWrapper.dataset.watermark;
       this.inputImage = document.querySelector(".main__input");
-      return this.ogTags = document.querySelectorAll("meta[name='twitter:image'], meta[itemprop='image'], meta[property='og:image']");
+      this.ogTags = document.querySelectorAll("meta[name='twitter:image'], meta[itemprop='image'], meta[property='og:image']");
+      return this.zoomItem = document.querySelectorAll(".main__zoom-item");
     };
 
     CanvasEditor.prototype.initFabric = function() {
@@ -811,7 +813,8 @@ window.throttle = throttle = function(fn, threshhold, scope) {
       this.canvas.setHeight(this.oImgSizes.height);
       this.canvas.setWidth(this.oImgSizes.width);
       this.f = fabric.Image.filters;
-      return this.upperCanvas = this.mainWrapper.querySelector(".upper-canvas");
+      this.upperCanvas = this.mainWrapper.querySelector(".upper-canvas");
+      return this.updFabricCtrl();
     };
 
     CanvasEditor.prototype.bindEvents = function() {
@@ -824,7 +827,12 @@ window.throttle = throttle = function(fn, threshhold, scope) {
           return _this.imgObj.src = e.target.result;
         };
       })(this));
-      return this.imgObj.addEventListener("load", this.imageLoaded.bind(this));
+      this.imgObj.addEventListener("load", this.imageLoaded.bind(this));
+      return [].forEach.call(this.zoomItem, (function(_this) {
+        return function(item) {
+          return item.addEventListener("click", _this.zoomItemClickHandler.bind(_this));
+        };
+      })(this));
     };
 
     CanvasEditor.prototype.setSizes = function() {
@@ -837,7 +845,8 @@ window.throttle = throttle = function(fn, threshhold, scope) {
       if (this.originalImg) {
         this.setImageSize();
         this.canvas.setHeight(this.originalImg.height);
-        return this.canvas.setWidth(this.originalImg.width);
+        this.canvas.setWidth(this.originalImg.width);
+        return this.centerCanvas();
       }
     };
 
@@ -856,6 +865,11 @@ window.throttle = throttle = function(fn, threshhold, scope) {
           height: iHeight / this.oImgSizes.scale
         });
       }
+    };
+
+    CanvasEditor.prototype.centerCanvas = function() {
+      this.canvas.wrapperEl.style.marginLeft = -this.canvas.width / 2 + "px";
+      return this.canvas.wrapperEl.style.marginTop = -this.canvas.height / 2 + "px";
     };
 
     CanvasEditor.prototype.fileAdded = function(e) {
@@ -970,6 +984,80 @@ window.throttle = throttle = function(fn, threshhold, scope) {
           return _this.canvas.add(img);
         };
       })(this));
+    };
+
+    CanvasEditor.prototype.zoomItemClickHandler = function(e) {
+      var scale;
+      if (e == null) {
+        e = window.event;
+      }
+      scale = .1;
+      console.log(e.target);
+      if (e.target.classList.contains("main__zoom-item_plus")) {
+        return this.zoomIt(1 + scale);
+      } else {
+        return this.zoomIt(1 - scale);
+      }
+    };
+
+    CanvasEditor.prototype.zoomIt = function(factor) {
+      var bi, i, left, objects, scaleX, scaleY, tempLeft, tempScaleX, tempScaleY, tempTop, top;
+      this.canvas.setHeight(this.canvas.getHeight() * factor);
+      this.canvas.setWidth(this.canvas.getWidth() * factor);
+      if (this.canvas.backgroundImage) {
+        bi = this.canvas.backgroundImage;
+        bi.width = bi.width * factor;
+        bi.height = bi.height * factor;
+      }
+      objects = this.canvas.getObjects();
+      for (i in objects) {
+        scaleX = objects[i].scaleX;
+        scaleY = objects[i].scaleY;
+        left = objects[i].left;
+        top = objects[i].top;
+        tempScaleX = scaleX * factor;
+        tempScaleY = scaleY * factor;
+        tempLeft = left * factor;
+        tempTop = top * factor;
+        objects[i].scaleX = tempScaleX;
+        objects[i].scaleY = tempScaleY;
+        objects[i].left = tempLeft;
+        objects[i].top = tempTop;
+        objects[i].setCoords();
+      }
+      this.canvas.renderAll();
+      this.canvas.calcOffset();
+      return this.centerCanvas();
+    };
+
+    CanvasEditor.prototype.configFabricCtrl = function() {
+      var _original;
+      _original = fabric.Object.prototype._drawControl;
+      return fabric.Object.prototype._drawControl = function(control, ctx, methodName, left, top) {
+        var size;
+        size = this.cornerSize = 15;
+        if (this.canvas.hasControlCallback && this.canvas.hasControlCallback[control]) {
+          return this.canvas.controlCallback[control](ctx, left, top, size);
+        } else {
+          return _original.call(this, control, ctx, methodName, left, top);
+        }
+      };
+    };
+
+    CanvasEditor.prototype.updFabricCtrl = function() {
+      this.canvas.hasControlCallback = {
+        mtr: true
+      };
+      return this.canvas.controlCallback = {
+        mtr: function(ctx, left, top, size) {
+          var image, x, y;
+          image = new Image(30, 30);
+          image.src = 'assets/i/rotate.svg';
+          x = left - (image.width / 2) + size / 2;
+          y = top - (image.height / 2) + size / 2;
+          return ctx.drawImage(image, x, y, 30, 30);
+        }
+      };
     };
 
     return CanvasEditor;
