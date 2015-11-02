@@ -6,6 +6,7 @@ class CanvasEditor
 		@f = fabric.Image.filters
 		@cacheDom()
 		@bindEvents()
+		@configFabricCtrl()
 
 	cacheDom: ->
 		@main = document.querySelector(".main")
@@ -13,6 +14,7 @@ class CanvasEditor
 		@watermarkImg = @mainWrapper.dataset.watermark
 		@inputImage = document.querySelector(".main__input")
 		@ogTags = document.querySelectorAll("meta[name='twitter:image'], meta[itemprop='image'], meta[property='og:image']")
+		@zoomItem = document.querySelectorAll(".main__zoom-item")
 
 	initFabric: ->
 		@mainWrapper.classList.add 'active'
@@ -21,6 +23,7 @@ class CanvasEditor
 		@canvas.setWidth(@oImgSizes.width)
 		@f = fabric.Image.filters
 		@upperCanvas = @mainWrapper.querySelector ".upper-canvas"
+		@updFabricCtrl()
 		# @canvas.on "after:render", debounce @setOGTags.bind(@), 2000
 
 	bindEvents: ->
@@ -29,6 +32,9 @@ class CanvasEditor
 			e ?= window.event
 			@imgObj.src = e.target.result
 		@imgObj.addEventListener "load", @imageLoaded.bind(@)
+		[].forEach.call @zoomItem, (item) =>
+			item.addEventListener "click", @zoomItemClickHandler.bind(@)
+		
 		
 	setSizes: ->
 		return unless @canvas
@@ -39,6 +45,7 @@ class CanvasEditor
 			@setImageSize()
 			@canvas.setHeight(@originalImg.height)
 			@canvas.setWidth(@originalImg.width)
+			@centerCanvas()
 
 	setImageSize: ->
 		if @originalImg
@@ -48,10 +55,16 @@ class CanvasEditor
 			iHeight = @oImgSizes.height
 			if iWidth > cWidth or iHeight > cHeight
 				@oImgSizes.scale = Math.max( iWidth / cWidth, iHeight / cHeight )
-
+			
 			@originalImg.set
 				width: iWidth / @oImgSizes.scale
 				height: iHeight / @oImgSizes.scale
+
+			
+
+	centerCanvas: ->
+		@canvas.wrapperEl.style.marginLeft = - @canvas.width / 2 + "px"
+		@canvas.wrapperEl.style.marginTop = - @canvas.height / 2 + "px"
 
 	fileAdded: (e) ->
 		e ?= window.event
@@ -127,6 +140,63 @@ class CanvasEditor
 				width: 50
 				height: 50
 			@canvas.add img
+
+	zoomItemClickHandler: (e) ->
+		e ?= window.event
+		scale = .1
+		console.log e.target
+		if e.target.classList.contains "main__zoom-item_plus"
+			@zoomIt(1 + scale)
+		else
+			@zoomIt(1 - scale)
+
+
+	zoomIt: (factor) ->
+		@canvas.setHeight @canvas.getHeight() * factor
+		@canvas.setWidth @canvas.getWidth() * factor
+		if @canvas.backgroundImage
+			# Need to scale background images as well
+			bi = @canvas.backgroundImage
+			bi.width = bi.width * factor
+			bi.height = bi.height * factor
+		objects = @canvas.getObjects()
+		for i of objects
+			scaleX = objects[i].scaleX
+			scaleY = objects[i].scaleY
+			left = objects[i].left
+			top = objects[i].top
+			tempScaleX = scaleX * factor
+			tempScaleY = scaleY * factor
+			tempLeft = left * factor
+			tempTop = top * factor
+			objects[i].scaleX = tempScaleX
+			objects[i].scaleY = tempScaleY
+			objects[i].left = tempLeft
+			objects[i].top = tempTop
+			objects[i].setCoords()
+		@canvas.renderAll()
+		@canvas.calcOffset()
+		@centerCanvas()
+
+	configFabricCtrl: ->
+		_original = fabric.Object::_drawControl
+		fabric.Object::_drawControl = (control, ctx, methodName, left, top) ->
+			size = @cornerSize = 15
+			if @canvas.hasControlCallback and @canvas.hasControlCallback[control]
+				@canvas.controlCallback[control] ctx, left, top, size
+			else
+				_original.call this, control, ctx, methodName, left, top
+
+	updFabricCtrl: ->
+		@canvas.hasControlCallback =
+			mtr: true
+		@canvas.controlCallback = 
+			mtr: (ctx, left, top, size) ->
+				image = new Image(30, 30)
+				image.src = 'assets/i/rotate.svg'
+				x = left - (image.width / 2) + size / 2
+				y = top - (image.height / 2) + size / 2
+				ctx.drawImage image, x, y, 30, 30
 
 document.addEventListener "DOMContentLoaded", ->
 	setTimeout =>
