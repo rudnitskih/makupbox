@@ -22,11 +22,15 @@ class Footer
 			@hasClass el, 'footer__item_back'
 		itemEffect = closest e.target, (el) =>
 			@hasClass el, 'footer__item_effect'
+		itemRemove = closest e.target, (el) =>
+			@hasClass el, 'footer__item_remove'
 
 		switch
 			when itemCat then @itemCatClick itemCat
 			when itemEffect then @itemEffectClick itemEffect
 			when itemBack then @itemBackClick()
+			when itemRemove then @itemRemoveClick()
+
 
 	itemCatClick: (cat) ->
 		effects = cat.querySelector "[type='template']"
@@ -54,9 +58,18 @@ class Footer
 		for key, item of @catEffectsRendered
 			item.classList.remove "active"
 		@catItems.classList.add "active"
+	
+	itemRemoveClick: ->
+
 
 	hasClass: (el, className) ->
 		el.classList && el.classList.contains className
 
+	# setActiveRemoveBtn: ->
+	# 	@block.querySelector(".footer__list.active .footer__item_remove").classList.add "active"
+
+	# removeActiveRemoveBtn: ->
+	# 	@block.querySelector(".footer__list.active .footer__item_remove").classList.remove "active"
+
 document.addEventListener "DOMContentLoaded", ->
-	new Footer "footer"
+	window.footer = new Footer "footer"

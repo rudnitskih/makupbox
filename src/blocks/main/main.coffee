@@ -23,7 +23,26 @@ class CanvasEditor
 		@canvas.setWidth(@oImgSizes.width)
 		@f = fabric.Image.filters
 		@upperCanvas = @mainWrapper.querySelector ".upper-canvas"
-		@updFabricCtrl()
+		# console.log 
+		# @canvas.set 
+		# @updFabricCtrl()
+		# interact('.draggable').draggable(
+		# 	manualStart: true
+		# )
+
+		@draggie = new Draggabilly( ".canvas-container", {} )
+		# @configFabricCtrl()
+		# @canvas.on "mouse:down", @mouseDown.bind(@)
+		# @canvas.on "mouse:up", @mouseUp.bind(@)
+
+		
+		@canvas.on "object:selected", =>
+			@draggie.disable()
+		# 	footer.setActiveRemoveBtn()
+		@canvas.on "selection:cleared", =>
+			@draggie.enable()
+			# footer.removeActiveRemoveBtn()
+			
 		# @canvas.on "after:render", debounce @setOGTags.bind(@), 2000
 
 	bindEvents: ->
@@ -34,7 +53,9 @@ class CanvasEditor
 		@imgObj.addEventListener "load", @imageLoaded.bind(@)
 		[].forEach.call @zoomItem, (item) =>
 			item.addEventListener "click", @zoomItemClickHandler.bind(@)
-		
+		document.addEventListener "keydown", (e) ->
+			e ?= e || window.event
+			@removeActive() if e.keyCode is 46
 		
 	setSizes: ->
 		return unless @canvas
@@ -60,7 +81,10 @@ class CanvasEditor
 				width: iWidth / @oImgSizes.scale
 				height: iHeight / @oImgSizes.scale
 
-			
+	mouseDown: ->
+		@selectAll()
+	mouseUp: ->
+		@unSelect()
 
 	centerCanvas: ->
 		@canvas.wrapperEl.style.marginLeft = - @canvas.width / 2 + "px"
@@ -75,6 +99,8 @@ class CanvasEditor
 		@originalImg = new fabric.Image(@imgObj)
 		@saveImageSizes()
 		@originalImg.selectable = false
+		@originalImg.hasBorders = false
+		@originalImg.hasControls = false
 		@initFabric()
 		@setSizes()
 		@canvas.add @originalImg
@@ -103,8 +129,13 @@ class CanvasEditor
 		return unless @canvas
 		fabric.Image.fromURL image, (oImg) =>
 			@setCenter oImg
+			oImg.set "globalCompositeOperation", "screen"
+			# configFabricCtrl
+			# oImg.filters[4] = new @f.Blend({image: @originalImg, mode: 'screen'}) 
 			@canvas.add oImg
 			@canvas.setActiveObject oImg
+			oImg.applyFilters(@canvas.renderAll.bind(@canvas))
+		# @selectAll()
 
 	setCenter: (el) ->
 		cWidth = @canvas.width
@@ -137,6 +168,8 @@ class CanvasEditor
 				originY: 'center'
 				left: @canvas.width - 50
 				top: @canvas.height - 50
+				hasBorders: false
+				hasControls: false
 				width: 50
 				height: 50
 			@canvas.add img
@@ -144,12 +177,12 @@ class CanvasEditor
 	zoomItemClickHandler: (e) ->
 		e ?= window.event
 		scale = .1
-		console.log e.target
 		if e.target.classList.contains "main__zoom-item_plus"
 			@zoomIt(1 + scale)
-		else
+		if e.target.classList.contains "main__zoom-item_minus"
 			@zoomIt(1 - scale)
-
+		if e.target.classList.contains "main__zoom-item_remove"
+			@removeActive()
 
 	zoomIt: (factor) ->
 		@canvas.setHeight @canvas.getHeight() * factor
@@ -178,14 +211,28 @@ class CanvasEditor
 		@canvas.calcOffset()
 		@centerCanvas()
 
-	configFabricCtrl: ->
-		_original = fabric.Object::_drawControl
-		fabric.Object::_drawControl = (control, ctx, methodName, left, top) ->
-			size = @cornerSize = 15
-			if @canvas.hasControlCallback and @canvas.hasControlCallback[control]
-				@canvas.controlCallback[control] ctx, left, top, size
-			else
-				_original.call this, control, ctx, methodName, left, top
+	configFabricCtrl: (obj)->
+		fabric.Object.prototype.setControlsVisibility
+			mt: false
+			mb: false
+			ml: false
+			mr: false
+			tl: false
+			tr: false
+			bl: false
+
+		fabric.Object::transparentCorners = false
+		fabric.Object::borderColor = "#161616"
+		fabric.Object::cornerColor = "#161616"
+		
+
+		# _original = fabric.Object::_drawControl
+		# fabric.Object::_drawControl = (control, ctx, methodName, left, top) ->
+			# size = @cornerSize = 15
+			# if @canvas.hasControlCallback and @canvas.hasControlCallback[control]
+				# @canvas.controlCallback[control] ctx, left, top, size
+			# else
+				# _original.call this, control, ctx, methodName, left, top
 
 	updFabricCtrl: ->
 		@canvas.hasControlCallback =
@@ -197,6 +244,33 @@ class CanvasEditor
 				x = left - (image.width / 2) + size / 2
 				y = top - (image.height / 2) + size / 2
 				ctx.drawImage image, x, y, 30, 30
+
+	removeActive: ->
+		obj = @canvas.getActiveObject()
+		obj.remove() if obj
+
+	selectAll: ->
+		objs = @canvas.getObjects().map((o) ->
+			o.set 'active', true
+		)
+		@group = new fabric.Group(objs)
+		@group.set
+			hasControls: false
+			hasBorders: false
+			originX: 'center'
+			originY: 'center'
+		@canvas._activeObject = null
+		@canvas.setActiveGroup(@group.setCoords()).renderAll()
+
+	unSelect: ->
+		items = @group._objects
+		@group._restoreObjectsState()
+		@canvas.remove(@group)
+		i = 0
+		while i < items.length
+			@canvas.add items[i]
+			i++
+		@canvas.renderAll()
 
 document.addEventListener "DOMContentLoaded", ->
 	setTimeout =>
