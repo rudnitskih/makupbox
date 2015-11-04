@@ -732,20 +732,6 @@ window.throttle = throttle = function(fn, threshhold, scope) {
 }).call(this);
 
 (function() {
-  document.addEventListener("DOMContentLoaded", function() {
-    var likely;
-    likely = document.querySelector(".likely");
-    if (likely) {
-      return likely.addEventListener("click", function(e) {
-        e.preventDefault();
-        return CanvasEditor.setOGTags();
-      });
-    }
-  });
-
-}).call(this);
-
-(function() {
   var Header;
 
   Header = (function() {
@@ -801,6 +787,20 @@ window.throttle = throttle = function(fn, threshhold, scope) {
 }).call(this);
 
 (function() {
+  document.addEventListener("DOMContentLoaded", function() {
+    var likely;
+    likely = document.querySelector(".likely");
+    if (likely) {
+      return likely.addEventListener("click", function(e) {
+        e.preventDefault();
+        return CanvasEditor.setOGTags();
+      });
+    }
+  });
+
+}).call(this);
+
+(function() {
   var CanvasEditor;
 
   CanvasEditor = (function() {
@@ -830,15 +830,19 @@ window.throttle = throttle = function(fn, threshhold, scope) {
       this.canvas.setWidth(this.oImgSizes.width);
       this.f = fabric.Image.filters;
       this.upperCanvas = this.mainWrapper.querySelector(".upper-canvas");
+      this.cont = this.mainWrapper.querySelector(".canvas-container");
       this.draggie = new Draggabilly(".canvas-container", {});
+      this.cont.classList.add("moving");
       this.canvas.on("object:selected", (function(_this) {
         return function() {
-          return _this.draggie.disable();
+          _this.draggie.disable();
+          return _this.cont.classList.remove("moving");
         };
       })(this));
       return this.canvas.on("selection:cleared", (function(_this) {
         return function() {
-          return _this.draggie.enable();
+          _this.draggie.enable();
+          return _this.cont.classList.add("moving");
         };
       })(this));
     };
