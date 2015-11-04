@@ -29,18 +29,23 @@ class CanvasEditor
 		# interact('.draggable').draggable(
 		# 	manualStart: true
 		# )
+		@cont = @mainWrapper.querySelector ".canvas-container"
 
 		@draggie = new Draggabilly( ".canvas-container", {} )
 		# @configFabricCtrl()
 		# @canvas.on "mouse:down", @mouseDown.bind(@)
 		# @canvas.on "mouse:up", @mouseUp.bind(@)
+		@cont.classList.add "moving"
 
 		
 		@canvas.on "object:selected", =>
 			@draggie.disable()
+			@cont.classList.remove "moving"
 		# 	footer.setActiveRemoveBtn()
 		@canvas.on "selection:cleared", =>
 			@draggie.enable()
+			@cont.classList.add "moving"
+
 			# footer.removeActiveRemoveBtn()
 			
 		# @canvas.on "after:render", debounce @setOGTags.bind(@), 2000
