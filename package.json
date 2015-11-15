@@ -14,7 +14,6 @@
     "serve-static": "*",
     "nib": "*",
     "gulp-data": "*",
-    "gulp-yaml": "*",
     "gulp-bower": "0.0.10",
     "gulp-rigger": "~0.5.8",
     "gulp-bower-files": "~0.2.7",

@@ -5,6 +5,7 @@
   "license": "MIT",
   "dependencies": {
     "normalize-css": "normalize.css#~3.0.3",
-    "fabric.js": "fabric#~1.5.0"
+    "fabric.js": "fabric#~1.5.0",
+    "Trip.js": "trip.js#~3.1.0"
   }
 }

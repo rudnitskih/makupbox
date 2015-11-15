@@ -7,7 +7,6 @@ var gulp = require('gulp'),
     data = require('gulp-data'),
     imagemin = require('gulp-imagemin'),
     path = require("path"),
-    yaml = require('gulp-yaml'),
     bower = require('gulp-bower'),
     mainBowerFiles = require('main-bower-files'),
     stylus = require('gulp-stylus'),
@@ -16,14 +15,23 @@ var gulp = require('gulp'),
     streamqueue = require('streamqueue'),
     filter = require('gulp-filter'),
     deploy = require('gulp-gh-pages'),
-    nib = require('nib');
+    vinylYamlData = require('vinyl-yaml-data'),
+    deepExtend = require('deep-extend-stream'),
+    nib = require('nib'),
+    locals = {};
 
-;
+gulp.task('yaml',function(){
+  locals = {};
+ 
+  return gulp.src('./src/data/*.yaml')
+    .pipe(vinylYamlData())
+    .pipe(deepExtend(locals));
+});
+
 gulp.task('jade', ["yaml"], function(){
-  var jsonData = combineJSONFiles("./src/tmp/data");
   gulp.src('./src/*.jade')
     .pipe(data( function(file) {
-      return jsonData;
+      return locals;
     }))
     .pipe(jade({ pretty: true }))
     .on('error', console.log)
@@ -91,13 +99,6 @@ gulp.task('imagemin',function(){
       .pipe(gulp.dest('./out/assets/i/'));
 });
 
-gulp.task('yaml',function(){
-  console.log('yaml');
-  gulp.src('./src/data/*.yaml')
-      .pipe(yaml())
-      .pipe(gulp.dest('./src/tmp/data'));
-});
-
 gulp.task('server', function() {
     connect()
       .use(require('connect-livereload')())
@@ -109,8 +110,7 @@ gulp.task('server', function() {
  gulp.task('watch', function(){
       livereload.listen();
 
-      gulp.watch(['src/blocks/**/*.jade', 'src/layouts/*.jade', 'src/*.jade' ] ,['jade']);
-      gulp.watch('src/data/*.yaml',['jade']);
+      gulp.watch(['src/blocks/**/*.jade', 'src/layouts/*.jade', 'src/*.jade', 'src/data/*.yaml' ] ,['jade']);
       gulp.watch([ 'src/blocks/**/*.coffee', 'src/assets/scripts/*.coffee' ],['scripts']);
       gulp.watch([ 'src/blocks/**/*.styl', 'src/assets/styles/*.styl' ],['styles']);
       gulp.start('server');

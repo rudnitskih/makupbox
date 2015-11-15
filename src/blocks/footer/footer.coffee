@@ -10,7 +10,6 @@ class Footer
 	cacheDom: ->
 		@catItems = @block.querySelector ".footer__list"
 
-
 	bindEvents: ->
 		@block.addEventListener "click", @blockClickHandler.bind(@)
 
