@@ -6,6 +6,1463 @@
 .split(" ")),fabric.Image.fromElement=function(e,n,r){var i=fabric.parseAttributes(e,fabric.Image.ATTRIBUTE_NAMES),s="xMidYMid",o="meet",u,a,f;i.preserveAspectRatio&&(f=i.preserveAspectRatio.split(" ")),f&&f.length&&(o=f.pop(),o!=="meet"&&o!=="slice"?(s=o,o="meet"):f.length&&(s=f.pop())),u=s!=="none"?s.slice(1,4):"none",a=s!=="none"?s.slice(5,8):"none",i.alignX=u,i.alignY=a,i.meetOrSlice=o,fabric.Image.fromURL(i["xlink:href"],n,t(r?fabric.util.object.clone(r):{},i))},fabric.Image.async=!0,fabric.Image.pngCompression=1}(typeof exports!="undefined"?exports:this),fabric.util.object.extend(fabric.Object.prototype,{_getAngleValueForStraighten:function(){var e=this.getAngle()%360;return e>0?Math.round((e-1)/90)*90:Math.round(e/90)*90},straighten:function(){return this.setAngle(this._getAngleValueForStraighten()),this},fxStraighten:function(e){e=e||{};var t=function(){},n=e.onComplete||t,r=e.onChange||t,i=this;return fabric.util.animate({startValue:this.get("angle"),endValue:this._getAngleValueForStraighten(),duration:this.FX_DURATION,onChange:function(e){i.setAngle(e),r()},onComplete:function(){i.setCoords(),n()},onStart:function(){i.set("active",!1)}}),this}}),fabric.util.object.extend(fabric.StaticCanvas.prototype,{straightenObject:function(e){return e.straighten(),this.renderAll(),this},fxStraightenObject:function(e){return e.fxStraighten({onChange:this.renderAll.bind(this)}),this}}),fabric.Image.filters=fabric.Image.filters||{},fabric.Image.filters.BaseFilter=fabric.util.createClass({type:"BaseFilter",initialize:function(e){e&&this.setOptions(e)},setOptions:function(e){for(var t in e)this[t]=e[t]},toObject:function(){return{type:this.type}},toJSON:function(){return this.toObject()}}),function(e){"use strict";var t=e.fabric||(e.fabric={}),n=t.util.object.extend;t.Image.filters.Brightness=t.util.createClass(t.Image.filters.BaseFilter,{type:"Brightness",initialize:function(e){e=e||{},this.brightness=e.brightness||0},applyTo:function(e){var t=e.getContext("2d"),n=t.getImageData(0,0,e.width,e.height),r=n.data,i=this.brightness;for(var s=0,o=r.length;s<o;s+=4)r[s]+=i,r[s+1]+=i,r[s+2]+=i;t.putImageData(n,0,0)},toObject:function(){return n(this.callSuper("toObject"),{brightness:this.brightness})}}),t.Image.filters.Brightness.fromObject=function(e){return new t.Image.filters.Brightness(e)}}(typeof exports!="undefined"?exports:this),function(e){"use strict";var t=e.fabric||(e.fabric={}),n=t.util.object.extend;t.Image.filters.Convolute=t.util.createClass(t.Image.filters.BaseFilter,{type:"Convolute",initialize:function(e){e=e||{},this.opaque=e.opaque,this.matrix=e.matrix||[0,0,0,0,1,0,0,0,0];var n=t.util.createCanvasElement();this.tmpCtx=n.getContext("2d")},_createImageData:function(e,t){return this.tmpCtx.createImageData(e,t)},applyTo:function(e){var t=this.matrix,n=e.getContext("2d"),r=n.getImageData(0,0,e.width,e.height),i=Math.round(Math.sqrt(t.length)),s=Math.floor(i/2),o=r.data,u=r.width,a=r.height,f=u,l=a,c=this._createImageData(f,l),h=c.data,p=this.opaque?1:0;for(var d=0;d<l;d++)for(var v=0;v<f;v++){var m=d,g=v,y=(d*f+v)*4,b=0,w=0,E=0,S=0;for(var x=0;x<i;x++)for(var T=0;T<i;T++){var N=m+x-s,C=g+T-s;if(N<0||N>a||C<0||C>u)continue;var k=(N*u+C)*4,L=t[x*i+T];b+=o[k]*L,w+=o[k+1]*L,E+=o[k+2]*L,S+=o[k+3]*L}h[y]=b,h[y+1]=w,h[y+2]=E,h[y+3]=S+p*(255-S)}n.putImageData(c,0,0)},toObject:function(){return n(this.callSuper("toObject"),{opaque:this.opaque,matrix:this.matrix})}}),t.Image.filters.Convolute.fromObject=function(e){return new t.Image.filters.Convolute(e)}}(typeof exports!="undefined"?exports:this),function(e){"use strict";var t=e.fabric||(e.fabric={}),n=t.util.object.extend;t.Image.filters.GradientTransparency=t.util.createClass(t.Image.filters.BaseFilter,{type:"GradientTransparency",initialize:function(e){e=e||{},this.threshold=e.threshold||100},applyTo:function(e){var t=e.getContext("2d"),n=t.getImageData(0,0,e.width,e.height),r=n.data,i=this.threshold,s=r.length;for(var o=0,u=r.length;o<u;o+=4)r[o+3]=i+255*(s-o)/s;t.putImageData(n,0,0)},toObject:function(){return n(this.callSuper("toObject"),{threshold:this.threshold})}}),t.Image.filters.GradientTransparency.fromObject=function(e){return new t.Image.filters.GradientTransparency(e)}}(typeof exports!="undefined"?exports:this),function(e){"use strict";var t=e.fabric||(e.fabric={});t.Image.filters.Grayscale=t.util.createClass(t.Image.filters.BaseFilter,{type:"Grayscale",applyTo:function(e){var t=e.getContext("2d"),n=t.getImageData(0,0,e.width,e.height),r=n.data,i=n.width*n.height*4,s=0,o;while(s<i)o=(r[s]+r[s+1]+r[s+2])/3,r[s]=o,r[s+1]=o,r[s+2]=o,s+=4;t.putImageData(n,0,0)}}),t.Image.filters.Grayscale.fromObject=function(){return new t.Image.filters.Grayscale}}(typeof exports!="undefined"?exports:this),function(e){"use strict";var t=e.fabric||(e.fabric={});t.Image.filters.Invert=t.util.createClass(t.Image.filters.BaseFilter,{type:"Invert",applyTo:function(e){var t=e.getContext("2d"),n=t.getImageData(0,0,e.width,e.height),r=n.data,i=r.length,s;for(s=0;s<i;s+=4)r[s]=255-r[s],r[s+1]=255-r[s+1],r[s+2]=255-r[s+2];t.putImageData(n,0,0)}}),t.Image.filters.Invert.fromObject=function(){return new t.Image.filters.Invert}}(typeof exports!="undefined"?exports:this),function(e){"use strict";var t=e.fabric||(e.fabric={}),n=t.util.object.extend;t.Image.filters.Mask=t.util.createClass(t.Image.filters.BaseFilter,{type:"Mask",initialize:function(e){e=e||{},this.mask=e.mask,this.channel=[0,1,2,3].indexOf(e.channel)>-1?e.channel:0},applyTo:function(e){if(!this.mask)return;var n=e.getContext("2d"),r=n.getImageData(0,0,e.width,e.height),i=r.data,s=this.mask.getElement(),o=t.util.createCanvasElement(),u=this.channel,a,f=r.width*r.height*4;o.width=s.width,o.height=s.height,o.getContext("2d").drawImage(s,0,0,s.width,s.height);var l=o.getContext("2d").getImageData(0,0,s.width,s.height),c=l.data;for(a=0;a<f;a+=4)i[a+3]=c[a+u];n.putImageData(r,0,0)},toObject:function(){return n(this.callSuper("toObject"),{mask:this.mask.toObject(),channel:this.channel})}}),t.Image.filters.Mask.fromObject=function(e,n){t.util.loadImage(e.mask.src,function(r){e.mask=new t.Image(r,e.mask),n&&n(new t.Image.filters.Mask(e))})},t.Image.filters.Mask.async=!0}(typeof exports!="undefined"?exports:this),function(e){"use strict";var t=e.fabric||(e.fabric={}),n=t.util.object.extend;t.Image.filters.Noise=t.util.createClass(t.Image.filters.BaseFilter,{type:"Noise",initialize:function(e){e=e||{},this.noise=e.noise||0},applyTo:function(e){var t=e.getContext("2d"),n=t.getImageData(0,0,e.width,e.height),r=n.data,i=this.noise,s;for(var o=0,u=r.length;o<u;o+=4)s=(.5-Math.random())*i,r[o]+=s,r[o+1]+=s,r[o+2]+=s;t.putImageData(n,0,0)},toObject:function(){return n(this.callSuper("toObject"),{noise:this.noise})}}),t.Image.filters.Noise.fromObject=function(e){return new t.Image.filters.Noise(e)}}(typeof exports!="undefined"?exports:this),function(e){"use strict";var t=e.fabric||(e.fabric={}),n=t.util.object.extend;t.Image.filters.Pixelate=t.util.createClass(t.Image.filters.BaseFilter,{type:"Pixelate",initialize:function(e){e=e||{},this.blocksize=e.blocksize||4},applyTo:function(e){var t=e.getContext("2d"),n=t.getImageData(0,0,e.width,e.height),r=n.data,i=n.height,s=n.width,o,u,a,f,l,c,h;for(u=0;u<i;u+=this.blocksize)for(a=0;a<s;a+=this.blocksize){o=u*4*s+a*4,f=r[o],l=r[o+1],c=r[o+2],h=r[o+3];for(var p=u,d=u+this.blocksize;p<d;p++)for(var v=a,m=a+this.blocksize;v<m;v++)o=p*4*s+v*4,r[o]=f,r[o+1]=l,r[o+2]=c,r[o+3]=h}t.putImageData(n,0,0)},toObject:function(){return n(this.callSuper("toObject"),{blocksize:this.blocksize})}}),t.Image.filters.Pixelate.fromObject=function(e){return new t.Image.filters.Pixelate(e)}}(typeof exports!="undefined"?exports:this),function(e){"use strict";var t=e.fabric||(e.fabric={}),n=t.util.object.extend;t.Image.filters.RemoveWhite=t.util.createClass(t.Image.filters.BaseFilter,{type:"RemoveWhite",initialize:function(e){e=e||{},this.threshold=e.threshold||30,this.distance=e.distance||20},applyTo:function(e){var t=e.getContext("2d"),n=t.getImageData(0,0,e.width,e.height),r=n.data,i=this.threshold,s=this.distance,o=255-i,u=Math.abs,a,f,l;for(var c=0,h=r.length;c<h;c+=4)a=r[c],f=r[c+1],l=r[c+2],a>o&&f>o&&l>o&&u(a-f)<s&&u(a-l)<s&&u(f-l)<s&&(r[c+3]=1);t.putImageData(n,0,0)},toObject:function(){return n(this.callSuper("toObject"),{threshold:this.threshold,distance:this.distance})}}),t.Image.filters.RemoveWhite.fromObject=function(e){return new t.Image.filters.RemoveWhite(e)}}(typeof exports!="undefined"?exports:this),function(e){"use strict";var t=e.fabric||(e.fabric={});t.Image.filters.Sepia=t.util.createClass(t.Image.filters.BaseFilter,{type:"Sepia",applyTo:function(e){var t=e.getContext("2d"),n=t.getImageData(0,0,e.width,e.height),r=n.data,i=r.length,s,o;for(s=0;s<i;s+=4)o=.3*r[s]+.59*r[s+1]+.11*r[s+2],r[s]=o+100,r[s+1]=o+50,r[s+2]=o+255;t.putImageData(n,0,0)}}),t.Image.filters.Sepia.fromObject=function(){return new t.Image.filters.Sepia}}(typeof exports!="undefined"?exports:this),function(e){"use strict";var t=e.fabric||(e.fabric={});t.Image.filters.Sepia2=t.util.createClass(t.Image.filters.BaseFilter,{type:"Sepia2",applyTo:function(e){var t=e.getContext("2d"),n=t.getImageData(0,0,e.width,e.height),r=n.data,i=r.length,s,o,u,a;for(s=0;s<i;s+=4)o=r[s],u=r[s+1],a=r[s+2],r[s]=(o*.393+u*.769+a*.189)/1.351,r[s+1]=(o*.349+u*.686+a*.168)/1.203,r[s+2]=(o*.272+u*.534+a*.131)/2.14;t.putImageData(n,0,0)}}),t.Image.filters.Sepia2.fromObject=function(){return new t.Image.filters.Sepia2}}(typeof exports!="undefined"?exports:this),function(e){"use strict";var t=e.fabric||(e.fabric={}),n=t.util.object.extend;t.Image.filters.Tint=t.util.createClass(t.Image.filters.BaseFilter,{type:"Tint",initialize:function(e){e=e||{},this.color=e.color||"#000000",this.opacity=typeof e.opacity!="undefined"?e.opacity:(new t.Color(this.color)).getAlpha()},applyTo:function(e){var n=e.getContext("2d"),r=n.getImageData(0,0,e.width,e.height),i=r.data,s=i.length,o,u,a,f,l,c,h,p,d;d=(new t.Color(this.color)).getSource(),u=d[0]*this.opacity,a=d[1]*this.opacity,f=d[2]*this.opacity,p=1-this.opacity;for(o=0;o<s;o+=4)l=i[o],c=i[o+1],h=i[o+2],i[o]=u+l*p,i[o+1]=a+c*p,i[o+2]=f+h*p;n.putImageData(r,0,0)},toObject:function(){return n(this.callSuper("toObject"),{color:this.color,opacity:this.opacity})}}),t.Image.filters.Tint.fromObject=function(e){return new t.Image.filters.Tint(e)}}(typeof exports!="undefined"?exports:this),function(e){"use strict";var t=e.fabric||(e.fabric={}),n=t.util.object.extend;t.Image.filters.Multiply=t.util.createClass(t.Image.filters.BaseFilter,{type:"Multiply",initialize:function(e){e=e||{},this.color=e.color||"#000000"},applyTo:function(e){var n=e.getContext("2d"),r=n.getImageData(0,0,e.width,e.height),i=r.data,s=i.length,o,u;u=(new t.Color(this.color)).getSource();for(o=0;o<s;o+=4)i[o]*=u[0]/255,i[o+1]*=u[1]/255,i[o+2]*=u[2]/255;n.putImageData(r,0,0)},toObject:function(){return n(this.callSuper("toObject"),{color:this.color})}}),t.Image.filters.Multiply.fromObject=function(e){return new t.Image.filters.Multiply(e)}}(typeof exports!="undefined"?exports:this),function(e){"use strict";var t=e.fabric;t.Image.filters.Blend=t.util.createClass({type:"Blend",initialize:function(e){e=e||{},this.color=e.color||"#000",this.image=e.image||!1,this.mode=e.mode||"multiply",this.alpha=e.alpha||1},applyTo:function(e){var n=e.getContext("2d"),r=n.getImageData(0,0,e.width,e.height),i=r.data,s,o,u,a,f,l,c,h,p,d,v=!1;if(this.image){v=!0;var m=t.util.createCanvasElement();m.width=this.image.width,m.height=this.image.height;var g=new t.StaticCanvas(m);g.add(this.image);var y=g.getContext("2d");d=y.getImageData(0,0,g.width,g.height).data}else d=(new t.Color(this.color)).getSource(),s=d[0]*this.alpha,o=d[1]*this.alpha,u=d[2]*this.alpha;for(var b=0,w=i.length;b<w;b+=4){a=i[b],f=i[b+1],l=i[b+2],v&&(s=d[b]*this.alpha,o=d[b+1]*this.alpha,u=d[b+2]*this.alpha);switch(this.mode){case"multiply":i[b]=a*s/255,i[b+1]=f*o/255,i[b+2]=l*u/255;break;case"screen":i[b]=1-(1-a)*(1-s),i[b+1]=1-(1-f)*(1-o),i[b+2]=1-(1-l)*(1-u);break;case"add":i[b]=Math.min(255,a+s),i[b+1]=Math.min(255,f+o),i[b+2]=Math.min(255,l+u);break;case"diff":case"difference":i[b]=Math.abs(a-s),i[b+1]=Math.abs(f-o),i[b+2]=Math.abs(l-u);break;case"subtract":c=a-s,h=f-o,p=l-u,i[b]=c<0?0:c,i[b+1]=h<0?0:h,i[b+2]=p<0?0:p;break;case"darken":i[b]=Math.min(a,s),i[b+1]=Math.min(f,o),i[b+2]=Math.min(l,u);break;case"lighten":i[b]=Math.max(a,s),i[b+1]=Math.max(f,o),i[b+2]=Math.max(l,u)}}n.putImageData(r,0,0)},toObject:function(){return{color:this.color,image:this.image,mode:this.mode,alpha:this.alpha}}}),t.Image.filters.Blend.fromObject=function(e){return new t.Image.filters.Blend(e)}}(typeof exports!="undefined"?exports:this),function(e){"use strict";var t=e.fabric||(e.fabric={}),n=Math.pow,r=Math.floor,i=Math.sqrt,s=Math.abs,o=Math.max,u=Math.round,a=Math.sin,f=Math.ceil;t.Image.filters.Resize=t.util.createClass(t.Image.filters.BaseFilter,{type:"Resize",resizeType:"hermite",scaleX:0,scaleY:0,lanczosLobes:3,applyTo:function(e,t,n){this.rcpScaleX=1/t,this.rcpScaleY=1/n;var r=e.width,i=e.height,s=u(r*t),o=u(i*n),a;this.resizeType==="sliceHack"&&(a=this.sliceByTwo(e,r,i,s,o)),this.resizeType==="hermite"&&(a=this.hermiteFastResize(e,r,i,s,o)),this.resizeType==="bilinear"&&(a=this.bilinearFiltering(e,r,i,s,o)),this.resizeType==="lanczos"&&(a=this.lanczosResize(e,r,i,s,o)),e.width=s,e.height=o,e.getContext("2d").putImageData(a,0,0)},sliceByTwo:function(e,n,i,s,u){var a=e.getContext("2d"),f,l=.5,c=.5,h=1,p=1,d=!1,v=!1,m=n,g=i,y=t.util.createCanvasElement(),b=y.getContext("2d");s=r(s),u=r(u),y.width=o(s,n),y.height=o(u,i),s>n&&(l=2,h=-1),u>i&&(c=2,p=-1),f=a.getImageData(0,0,n,i),e.width=o(s,n),e.height=o(u,i),a.putImageData(f,0,0);while(!d||!v)n=m,i=g,s*h<r(m*l*h)?m=r(m*l):(m=s,d=!0),u*p<r(g*c*p)?g=r(g*c):(g=u,v=!0),f=a.getImageData(0,0,n,i),b.putImageData(f,0,0),a.clearRect(0,0,m,g),a.drawImage(y,0,0,n,i,0,0,m,g);return a.getImageData(0,0,s,u)},lanczosResize:function(e,t,o,u,l){function c(e){return function(t){if(t>e)return 0;t*=Math.PI;if(s(t)<1e-16)return 1;var n=t/e;return a(t)*a(n)/t/n}}function h(e){var a,f,c,p,d,L,A,O,M,_,D;C.x=(e+.5)*b,k.x=r(C.x);for(a=0;a<l;a++){C.y=(a+.5)*w,k.y=r(C.y),d=0,L=0,A=0,O=0,M=0;for(f=k.x-x;f<=k.x+x;f++){if(f<0||f>=t)continue;_=r(1e3*s(f-C.x)),N[_]||(N[_]={});for(var P=k.y-T;P<=k.y+T;P++){if(P<0||P>=o)continue;D=r(1e3*s(P-C.y)),N[_][D]||(N[_][D]=y(i(n(_*E,2)+n(D*S,2))/1e3)),c=N[_][D],c>0&&(p=(P*t+f)*4,d+=c,L+=c*m[p],A+=c*m[p+1],O+=c*m[p+2],M+=c*m[p+3])}}p=(a*u+e)*4,g[p]=L/d,g[p+1]=A/d,g[p+2]=O/d,g[p+3]=M/d}return++e<u?h(e):v}var p=e.getContext("2d"),d=p.getImageData(0,0,t,o),v=p.getImageData(0,0,u,l),m=d.data,g=v.data,y=c(this.lanczosLobes),b=this.rcpScaleX,w=this.rcpScaleY,E=2/this.rcpScaleX,S=2/this.rcpScaleY,x=f(b*this.lanczosLobes/2),T=f(w*this.lanczosLobes/2),N={},C={},k={};return h(0)},bilinearFiltering:function(e,t,n,i,s){var o,u,a,f,l,c,h,p,d,v,m,g,y=0,b,w=this.rcpScaleX,E=this.rcpScaleY,S=e.getContext("2d"),x=4*(t-1),T=S.getImageData(0,0,t,n),N=T.data,C=S.getImageData(0,0,i,s),k=C.data;for(h=0;h<s;h++)for(p=0;p<i;p++){l=r(w*p),c=r(E*h),d=w*p-l,v=E*h-c,b=4*(c*t+l);for(m=0;m<4;m++)o=N[b+m],u=N[b+4+m],a=N[b+x+m],f=N[b+x+4+m],g=o*(1-d)*(1-v)+u*d*(1-v)+a*v*(1-d)+f*d*v,k[y++]=g}return C},hermiteFastResize:function(e,t,n,o,u){var a=this.rcpScaleX,l=this.rcpScaleY,c=f(a/2),h=f(l/2),p=e.getContext("2d"),d=p.getImageData(0,0,t,n),v=d.data,m=p.getImageData(0,0,o,u),g=m.data;for(var y=0;y<u;y++)for(var b=0;b<o;b++){var w=(b+y*o)*4,E=0,S=0,x=0,T=0,N=0,C=0,k=0,L=(y+.5)*l;for(var A=r(y*l);A<(y+1)*l;A++){var O=s(L-(A+.5))/h,M=(b+.5)*a,_=O*O;for(var D=r(b*a);D<(b+1)*a;D++){var P=s(M-(D+.5))/c,H=i(_+P*P);if(H>1&&H<-1)continue;E=2*H*H*H-3*H*H+1,E>0&&(P=4*(D+A*t),k+=E*v[P+3],x+=E,v[P+3]<255&&(E=E*v[P+3]/250),T+=E*v[P],N+=E*v[P+1],C+=E*v[P+2],S+=E)}}g[w]=T/S,g[w+1]=N/S,g[w+2]=C/S,g[w+3]=k/x}return m},toObject:function(){return{type:this.type,scaleX:this.scaleX,scaley:this.scaleY,resizeType:this.resizeType,lanczosLobes:this.lanczosLobes}}}),t.Image.filters.Resize.fromObject=function(){return new t.Image.filters.Resize}}(typeof exports!="undefined"?exports:this),function(e){"use strict";var t=e.fabric||(e.fabric={}),n=t.util.object.extend,r=t.util.object.clone,i=t.util.toFixed,s=t.StaticCanvas.supports("setLineDash");if(t.Text){t.warn("fabric.Text is already defined");return}var o=t.Object.prototype.stateProperties.concat();o.push("fontFamily","fontWeight","fontSize","text","textDecoration","textAlign","fontStyle","lineHeight","textBackgroundColor"),t.Text=t.util.createClass(t.Object,{_dimensionAffectingProps:{fontSize:!0,fontWeight:!0,fontFamily:!0,fontStyle:!0,lineHeight:!0,stroke:!0,strokeWidth:!0,text:!0,textAlign:!0},_reNewline:/\r?\n/,type:"text",fontSize:40,fontWeight:"normal",fontFamily:"Times New Roman",textDecoration:"",textAlign:"left",fontStyle:"",lineHeight:1.16,textBackgroundColor:"",stateProperties:o,stroke:null,shadow:null,_fontSizeFraction:.25,_fontSizeMult:1.13,initialize:function(e,t){t=t||{},this.text=e,this.__skipDimension=!0,this.setOptions(t),this.__skipDimension=!1,this._initDimensions()},_initDimensions:function(e){if(this.__skipDimension)return;e||(e=t.util.createCanvasElement().getContext("2d"),this._setTextStyles(e)),this._textLines=this.text.split(this._reNewline),this._clearCache();var n=this.textAlign;this.textAlign="left",this.width=this._getTextWidth(e),this.textAlign=n,this.height=this._getTextHeight(e)},toString:function(){return"#<fabric.Text ("+this.complexity()+'): { "text": "'+this.text+'", "fontFamily": "'+this.fontFamily+'" }>'},_render:function(e){this.clipTo&&t.util.clipContext(this,e),this._renderTextBackground(e),this._renderText(e),this._renderTextDecoration(e),this.clipTo&&e.restore()},_renderText:function(e){e.save(),this._translateForTextAlign(e),this._setOpacity(e),this._setShadow(e),this._setupCompositeOperation(e),this._renderTextFill(e),this._renderTextStroke(e),this._restoreCompositeOperation(e),this._removeShadow(e),e.restore()},_translateForTextAlign:function(e){this.textAlign!=="left"&&this.textAlign!=="justify"&&e.translate(this.textAlign==="center"?this.width/2:this.width,0)},_setTextStyles:function(e){e.textBaseline="alphabetic",this.skipTextAlign||(e.textAlign=this.textAlign),e.font=this._getFontDeclaration()},_getTextHeight:function(){return this._textLines.length*this._getHeightOfLine()},_getTextWidth:function(e){var t=this._getLineWidth(e,0);for(var n=1,r=this._textLines.length;n<r;n++){var i=this._getLineWidth(e,n);i>t&&(t=i)}return t},_renderChars:function(e,t,n,r,i){t[e](n,r,i)},_renderTextLine:function(e,t,n,r,i,s){i-=this.fontSize*this._fontSizeFraction;if(this.textAlign!=="justify"){this._renderChars(e,t,n,r,i,s);return}var o=this._getLineWidth(t,s),u=this.width;if(u>=o){var a=n.split(/\s+/),f=this._getWidthOfWords(t,n,s),l=u-f,c=a.length-1,h=l/c,p=0;for(var d=0,v=a.length;d<v;d++)this._renderChars(e,t,a[d],r+p,i,s),p+=t.measureText(a[d]).width+h}else this._renderChars(e,t,n,r,i,s)},_getWidthOfWords:function(e,t){return e.measureText(t.replace(/\s+/g,"")).width},_getLeftOffset:function(){return-this.width/2},_getTopOffset:function(){return-this.height/2},_renderTextFill:function(e){if(!this.fill&&!this._skipFillStrokeCheck)return;var t=0;for(var n=0,r=this._textLines.length;n<r;n++){var i=this._getHeightOfLine(e,n),s=i/this.lineHeight;this._renderTextLine("fillText",e,this._textLines[n],this._getLeftOffset(),this._getTopOffset()+t+s,n),t+=i}this.shadow&&!this.shadow.affectStroke&&this._removeShadow(e)},_renderTextStroke:function(e){if((!this.stroke||this.strokeWidth===0)&&!this._skipFillStrokeCheck)return;var t=0;e.save(),this.strokeDashArray&&(1&this.strokeDashArray.length&&this.strokeDashArray.push.apply(this.strokeDashArray,this.strokeDashArray),s&&e.setLineDash(this.strokeDashArray)),e.beginPath();for(var n=0,r=this._textLines.length;n<r;n++){var i=this._getHeightOfLine(e,n),o=i/this.lineHeight;this._renderTextLine("strokeText",e,this._textLines[n],this._getLeftOffset(),this._getTopOffset()+t+o,n),t+=i}e.closePath(),e.restore()},_getHeightOfLine:function(){return this.fontSize*this._fontSizeMult*this.lineHeight},_renderTextBackground:function(e){this._renderTextBoxBackground(e),this._renderTextLinesBackground(e)},_renderTextBoxBackground:function(e){if(!this.backgroundColor)return;e.save(),e.fillStyle=this.backgroundColor,e.fillRect(this._getLeftOffset(),this._getTopOffset(),this.width,this.height),e.restore()},_renderTextLinesBackground:function(e){var t=0,n=this._getHeightOfLine();if(!this.textBackgroundColor)return;e.save(),e.fillStyle=this.textBackgroundColor;for(var r=0,i=this._textLines.length;r<i;r++){if(this._textLines[r]!==""){var s=this._getLineWidth(e,r),o=this._getLineLeftOffset(s);e.fillRect(this._getLeftOffset()+o,this._getTopOffset()+t,s,this.fontSize*this._fontSizeMult)}t+=n}e.restore()},_getLineLeftOffset:function(e){return this.textAlign==="center"?(this.width-e)/2:this.textAlign==="right"?this.width-e:0},_clearCache:function(){this.__lineWidths=[],this.__lineHeights=[],this.__lineOffsets=[]},_shouldClearCache:function(){var e=!1;for(var t in this._dimensionAffectingProps)this["__"+t]!==this[t]&&(this["__"+t]=this[t],e=!0);return e},_getLineWidth:function(e,t){return this.__lineWidths[t]?this.__lineWidths[t]:(this.__lineWidths[t]=e.measureText(this._textLines[t]).width,this.__lineWidths[t])},_renderTextDecoration:function(e){function i(r){var i,s=0,o,u,a;for(i=0,o=n._textLines.length;i<o;i++){var f=n._getLineWidth(e,i),l=n._getLineLeftOffset(f),c=n._getHeightOfLine(e,i);for(u=0,a=r.length;u<a;u++)e.fillRect(n._getLeftOffset()+l,s+(n._fontSizeMult-1+r[u])*n.fontSize-t,f,n.fontSize/15);s+=c}}if(!this.textDecoration)return;var t=this.height/2,n=this,r=[];this.textDecoration.indexOf("underline")>-1&&r.push(.85),this.textDecoration.indexOf("line-through")>-1&&r.push(.43),this.textDecoration.indexOf("overline")>-1&&r.push(-0.12),r.length>0&&i(r)},_getFontDeclaration:function(){return[t.isLikelyNode?this.fontWeight:this.fontStyle,t.isLikelyNode?this.fontStyle:this.fontWeight,this.fontSize+"px",t.isLikelyNode?'"'+this.fontFamily+'"':this.fontFamily].join(" ")},render:function(e,t){if(!this.visible)return;e.save(),this._setTextStyles(e),this._shouldClearCache()&&this._initDimensions(e),t||this.transform(e),this._setStrokeStyles(e),this._setFillStyles(e),this.transformMatrix&&e.transform.apply(e,this.transformMatrix),this.group&&this.group.type==="path-group"&&e.translate(this.left,this.top),this._render(e),e.restore()},toObject:function(e){var t=n(this.callSuper("toObject",e),{text:this.text,fontSize:this.fontSize,fontWeight:this.fontWeight,fontFamily:this.fontFamily,fontStyle:this.fontStyle,lineHeight:this.lineHeight,textDecoration:this.textDecoration,textAlign:this.textAlign,textBackgroundColor:this.textBackgroundColor});return this.includeDefaultValues||this._removeDefaultValues(t),t},toSVG:function(e){var t=this._createBaseSVGMarkup(),n=this._getSVGLeftTopOffsets(this.ctx),r=this._getSVGTextAndBg(n.textTop,n.textLeft);return this._wrapSVGTextAndBg(t,r),e?e(t.join("")):t.join("")},_getSVGLeftTopOffsets:function(e){var t=this._getHeightOfLine(e,0),n=-this.width/2,r=0;return{textLeft:n+(this.group&&this.group.type==="path-group"?this.left:0),textTop:r+(this.group&&this.group.type==="path-group"?-this.top:0),lineTop:t}},_wrapSVGTextAndBg:function(e,t){e.push('	<g transform="',this.getSvgTransform(),this.getSvgTransformMatrix(),'">\n',t.textBgRects.join(""),"		<text ",this.fontFamily?'font-family="'+this.fontFamily.replace(/"/g,"'")+'" ':"",this.fontSize?'font-size="'+this.fontSize+'" ':"",this.fontStyle?'font-style="'+this.fontStyle+'" ':"",this.fontWeight?'font-weight="'+this.fontWeight+'" ':"",this.textDecoration?'text-decoration="'+this.textDecoration+'" ':"",'style="',this.getSvgStyles(),'" >',t.textSpans.join(""),"</text>\n","	</g>\n")},_getSVGTextAndBg:function(e,t){var n=[],r=[],i=0;this._setSVGBg(r);for(var s=0,o=this._textLines.length;s<o;s++)this.textBackgroundColor&&this._setSVGTextLineBg(r,s,t,e,i),this._setSVGTextLineText(s,n,i,t,e,r),i+=this._getHeightOfLine(this.ctx,s);return{textSpans:n,textBgRects:r}},_setSVGTextLineText:function(e,n,r,s,o){var u=this.fontSize*(this._fontSizeMult-this._fontSizeFraction)-o+r-this.height/2;n.push('<tspan x="',i(s+this._getLineLeftOffset(this.__lineWidths[e]),4),'" ','y="',i(u,4),'" ',this._getFillAttributes(this.fill),">",t.util.string.escapeXml(this._textLines[e]),"</tspan>")},_setSVGTextLineBg:function(e,t,n,r,s){e.push("		<rect ",this._getFillAttributes(this.textBackgroundColor),' x="',i(n+this._getLineLeftOffset(this.__lineWidths[t]),4),'" y="',i(s-this.height/2,4),'" width="',i(this.__lineWidths[t],4),'" height="',i(this._getHeightOfLine(this.ctx,t)/this.lineHeight,4),'"></rect>\n')},_setSVGBg:function(e){this.backgroundColor&&e.push("		<rect ",this._getFillAttributes(this.backgroundColor),' x="',i(-this.width/2,4),'" y="',i(-this.height/2,4),'" width="',i(this.width,4),'" height="',i(this.height,4),'"></rect>\n')},_getFillAttributes:function(e){var n=e&&typeof e=="string"?new t.Color(e):"";return!n||!n.getSource()||n.getAlpha()===1?'fill="'+e+'"':'opacity="'+n.getAlpha()+'" fill="'+n.setAlpha(1).toRgb()+'"'},_set:function(e,t){this.callSuper("_set",e,t),e in this._dimensionAffectingProps&&(this._initDimensions(),this.setCoords())},complexity:function(){return 1}}),t.Text.ATTRIBUTE_NAMES=t.SHARED_ATTRIBUTES.concat("x y dx dy font-family font-style font-weight font-size text-decoration text-anchor".split(" ")),t.Text.DEFAULT_SVG_FONT_SIZE=16,t.Text.fromElement=function(e,n){if(!e)return null;var r=t.parseAttributes(e,t.Text.ATTRIBUTE_NAMES);n=t.util.object.extend(n?t.util.object.clone(n):{},r),n.top=n.top||0,n.left=n.left||0,"dx"in r&&(n.left+=r.dx),"dy"in r&&(n.top+=r.dy),"fontSize"in n||(n.fontSize=t.Text.DEFAULT_SVG_FONT_SIZE),n.originX||(n.originX="left");var i=e.textContent.replace(/^\s+|\s+$|\n+/g,"").replace(/\s+/g," "),s=new t.Text(i,n),o=0;return s.originX==="left"&&(o=s.getWidth()/2),s.originX==="right"&&(o=-s.getWidth()/2),s.set({left:s.getLeft()+o,top:s.getTop()-s.getHeight()/2+s.fontSize*(.18+s._fontSizeFraction)}),s},t.Text.fromObject=function(e){return new t.Text(e.text,r(e))},t.util.createAccessors(t.Text)}(typeof exports!="undefined"?exports:this),function(){var e=fabric.util.object.clone;fabric.IText=fabric.util.createClass(fabric.Text,fabric.Observable,{type:"i-text",selectionStart:0,selectionEnd:0,selectionColor:"rgba(17,119,255,0.3)",isEditing:!1,editable:!0,editingBorderColor:"rgba(102,153,255,0.25)",cursorWidth:2,cursorColor:"#333",cursorDelay:1e3,cursorDuration:600,styles:null,caching:!0,_skipFillStrokeCheck:!1,_reSpace:/\s|\n/,_currentCursorOpacity:0,_selectionDirection:null,_abortCursorAnimation:!1,_charWidthsCache:{},initialize:function(e,t){this.styles=t?t.styles||{}:{},this.callSuper("initialize",e,t),this.initBehavior()},_clearCache:function(){this.callSuper("_clearCache"),this.__maxFontHeights=[],this.__widthOfSpace=[]},isEmptyStyles:function(){if(!this.styles)return!0;var e=this.styles;for(var t in e)for(var n in e[t])for(var r in e[t][n])return!1;return!0},setSelectionStart:function(e){e=Math.max(e,0),this.selectionStart!==e&&(this.fire("selection:changed"),this.canvas&&this.canvas.fire("text:selection:changed",{target:this}),this.selectionStart=e),this._updateTextarea()},setSelectionEnd:function(e){e=Math.min(e,this.text.length),this.selectionEnd!==e&&(this.fire("selection:changed"),this.canvas&&this.canvas.fire("text:selection:changed",{target:this}),this.selectionEnd=e),this._updateTextarea()},getSelectionStyles:function(e,t){if(arguments.length===2){var n=[];for(var r=e;r<t;r++)n.push(this.getSelectionStyles(r));return n}var i=this.get2DCursorLocation(e);return this.styles[i.lineIndex]?this.styles[i.lineIndex][i.charIndex]||{}:{}},setSelectionStyles:function(e){if(this.selectionStart===this.selectionEnd)this._extendStyles(this.selectionStart,e);else for(var t=this.selectionStart;t<this.selectionEnd;t++)this._extendStyles(t,e);return this._clearCache(),this},_extendStyles:function(e,t){var n=this.get2DCursorLocation(e);this.styles[n.lineIndex]||(this.styles[n.lineIndex]={}),this.styles[n.lineIndex][n.charIndex]||(this.styles[n.lineIndex][n.charIndex]={}),fabric.util.object.extend(this.styles[n.lineIndex][n.charIndex],t)},_render:function(e){this.callSuper("_render",e),this.ctx=e,this.isEditing&&this.renderCursorOrSelection()},renderCursorOrSelection:function(){if(!this.active)return;var e=this.text.split(""),t,n;this.canvas.contextTop?(n=this.canvas.contextTop,n.save(),n.transform.apply(n,this.canvas.viewportTransform),this.transform(n)):(n=this.ctx,n.save()),this.selectionStart===this.selectionEnd?(t=this._getCursorBoundaries(e,"cursor"),this.renderCursor(t,n)):(t=this._getCursorBoundaries(e,"selection"),this.renderSelection(e,t,n)),n.restore()},get2DCursorLocation:function(e){typeof e=="undefined"&&(e=this.selectionStart);var t=this.text.slice(0,e),n=t.split(this._reNewline);return{lineIndex:n.length-1,charIndex:n[n.length-1].length}},getCurrentCharStyle:function(e,t){var n=this.styles[e]&&this.styles[e][t===0?0:t-1];return{fontSize:n&&n.fontSize||this.fontSize,fill:n&&n.fill||this.fill,textBackgroundColor:n&&n.textBackgroundColor||this.textBackgroundColor,textDecoration:n&&n.textDecoration||this.textDecoration,fontFamily:n&&n.fontFamily||this.fontFamily,fontWeight:n&&n.fontWeight||this.fontWeight,fontStyle:n&&n.fontStyle||this.fontStyle,stroke:n&&n.stroke||this.stroke,strokeWidth:n&&n.strokeWidth||this.strokeWidth}},getCurrentCharFontSize:function(e,t){return this.styles[e]&&this.styles[e][t===0?0:t-1]&&this.styles[e][t===0?0:t-1].fontSize||this.fontSize},getCurrentCharColor:function(e,t){return this.styles[e]&&this.styles[e][t===0?0:t-1]&&this.styles[e][t===0?0:t-1].fill||this.cursorColor},_getCursorBoundaries:function(e,t){var n=Math.round(this._getLeftOffset()),r=this._getTopOffset(),i=this._getCursorBoundariesOffsets(e,t);return{left:n,top:r,leftOffset:i.left+i.lineLeft,topOffset:i.top}},_getCursorBoundariesOffsets:function(e,t){var n=0,r=0,i=0,s=0,o=0;for(var u=0;u<this.selectionStart;u++)e[u]==="\n"?(o=0,s+=this._getHeightOfLine(this.ctx,r),r++,i=0):(o+=this._getWidthOfChar(this.ctx,e[u],r,i),i++),n=this._getCachedLineOffset(r);return t==="cursor"&&(s+=(1-this._fontSizeFraction)*this._getHeightOfLine(this.ctx,r)/this.lineHeight-this.getCurrentCharFontSize(r,i)*(1-this._fontSizeFraction)),{top:s,left:o,lineLeft:n}},_getCachedLineOffset:function(e){var t=this._getLineWidth(this.ctx,e);return this.__lineOffsets[e]||(this.__lineOffsets[e]=this._getLineLeftOffset(t))},renderCursor:function(e,t){var n=this.get2DCursorLocation(),r=n.lineIndex,i=n.charIndex,s=this.getCurrentCharFontSize(r,i),o=r===0&&i===0?this._getCachedLineOffset(r):e.leftOffset;t.fillStyle=this.getCurrentCharColor(r,i),t.globalAlpha=this.__isMousedown?1:this._currentCursorOpacity,t.fillRect(e.left+o,e.top+e.topOffset,this.cursorWidth/this.scaleX,s)},renderSelection:function(e,t,n){n.fillStyle=this.selectionColor;var r=this.get2DCursorLocation(this.selectionStart),i=this.get2DCursorLocation(this.selectionEnd),s=r.lineIndex,o=i.lineIndex;for(var u=s;u<=o;u++){var a=this._getCachedLineOffset(u)||0,f=this._getHeightOfLine(this.ctx,u),l=0,c=this._textLines[u];if(u===s)for(var h=0,p=c.length;h<p;h++)h>=r.charIndex&&(u!==o||h<i.charIndex)&&(l+=this._getWidthOfChar(n,c[h],u,h)),h<r.charIndex&&(a+=this._getWidthOfChar(n,c[h],u,h));else if(u>s&&u<o)l+=this._getLineWidth(n,u)||5;else if(u===o)for(var d=0,v=i.charIndex;d<v;d++)l+=this._getWidthOfChar(n,c[d],u,d);n.fillRect(t.left+a,t.top+t.topOffset,l,f),t.topOffset+=f}},_renderChars:function(e,t,n,r,i,s){if(this.isEmptyStyles())return this._renderCharsFast(e,t,n,r,i);this.skipTextAlign=!0,r-=this.textAlign==="center"?this.width/2:this.textAlign==="right"?this.width:0;var o=this._getHeightOfLine(t,s),u=this._getCachedLineOffset(s),a=n.split(""),f,l="";r+=u||0,t.save(),i-=o/this.lineHeight*this._fontSizeFraction;for(var c=0,h=a.length;c<=h;c++){f=f||this.getCurrentCharStyle(s,c);var p=this.getCurrentCharStyle(s,c+1);if(this._hasStyleChanged(f,p)||c===h)this._renderChar(e,t,s,c-1,l,r,i,o),l="",f=p;l+=a[c]}t.restore()},_renderCharsFast:function(e,t,n,r,i){this.skipTextAlign=!1,e==="fillText"&&this.fill&&this.callSuper("_renderChars",e,t,n,r,i),e==="strokeText"&&(this.stroke&&this.strokeWidth>0||this.skipFillStrokeCheck)&&this.callSuper("_renderChars",e,t,n,r,i)},_renderChar:function(e,t,n,r,i,s,o,u){var a,f,l,c=this._fontSizeFraction*u/this.lineHeight;if(this.styles&&this.styles[n]&&(a=this.styles[n][r])){var h=a.stroke||this.stroke,p=a.fill||this.fill;t.save(),f=this._applyCharStylesGetWidth(t,i,n,r,a),l=this._getHeightOfChar(t,i,n,r),p&&t.fillText(i,s,o),h&&t.strokeText(i,s,o),this._renderCharDecoration(t,a,s,o,c,f,l),t.restore(),t.translate(f,0)}else e==="strokeText"&&
 this.stroke&&t[e](i,s,o),e==="fillText"&&this.fill&&t[e](i,s,o),f=this._applyCharStylesGetWidth(t,i,n,r),this._renderCharDecoration(t,null,s,o,c,f,this.fontSize),t.translate(t.measureText(i).width,0)},_hasStyleChanged:function(e,t){return e.fill!==t.fill||e.fontSize!==t.fontSize||e.textBackgroundColor!==t.textBackgroundColor||e.textDecoration!==t.textDecoration||e.fontFamily!==t.fontFamily||e.fontWeight!==t.fontWeight||e.fontStyle!==t.fontStyle||e.stroke!==t.stroke||e.strokeWidth!==t.strokeWidth},_renderCharDecoration:function(e,t,n,r,i,s,o){var u=t?t.textDecoration||this.textDecoration:this.textDecoration;if(!u)return;u.indexOf("underline")>-1&&e.fillRect(n,r+o/10,s,o/15),u.indexOf("line-through")>-1&&e.fillRect(n,r-o*(this._fontSizeFraction+this._fontSizeMult-1)+o/15,s,o/15),u.indexOf("overline")>-1&&e.fillRect(n,r-(this._fontSizeMult-this._fontSizeFraction)*o,s,o/15)},_renderTextLine:function(e,t,n,r,i,s){this.isEmptyStyles()||(i+=this.fontSize*(this._fontSizeFraction+.03)),this.callSuper("_renderTextLine",e,t,n,r,i,s)},_renderTextDecoration:function(e){if(this.isEmptyStyles())return this.callSuper("_renderTextDecoration",e)},_renderTextLinesBackground:function(e){if(!this.textBackgroundColor&&!this.styles)return;e.save(),this.textBackgroundColor&&(e.fillStyle=this.textBackgroundColor);var t=0;for(var n=0,r=this._textLines.length;n<r;n++){var i=this._getHeightOfLine(e,n);if(this._textLines[n]===""){t+=i;continue}var s=this._getLineWidth(e,n),o=this._getCachedLineOffset(n);this.textBackgroundColor&&(e.fillStyle=this.textBackgroundColor,e.fillRect(this._getLeftOffset()+o,this._getTopOffset()+t,s,i/this.lineHeight));if(this.styles[n])for(var u=0,a=this._textLines[n].length;u<a;u++)if(this.styles[n]&&this.styles[n][u]&&this.styles[n][u].textBackgroundColor){var f=this._textLines[n][u];e.fillStyle=this.styles[n][u].textBackgroundColor,e.fillRect(this._getLeftOffset()+o+this._getWidthOfCharsAt(e,n,u),this._getTopOffset()+t,this._getWidthOfChar(e,f,n,u)+1,i/this.lineHeight)}t+=i}e.restore()},_getCacheProp:function(e,t){return e+t.fontFamily+t.fontSize+t.fontWeight+t.fontStyle+t.shadow},_applyCharStylesGetWidth:function(t,n,r,i,s){var o=s||this.styles[r]&&this.styles[r][i];o?o=e(o):o={},this._applyFontStyles(o);var u=this._getCacheProp(n,o);if(this.isEmptyStyles()&&this._charWidthsCache[u]&&this.caching)return this._charWidthsCache[u];typeof o.shadow=="string"&&(o.shadow=new fabric.Shadow(o.shadow));var a=o.fill||this.fill;return t.fillStyle=a.toLive?a.toLive(t,this):a,o.stroke&&(t.strokeStyle=o.stroke&&o.stroke.toLive?o.stroke.toLive(t,this):o.stroke),t.lineWidth=o.strokeWidth||this.strokeWidth,t.font=this._getFontDeclaration.call(o),this._setShadow.call(o,t),this.caching?(this._charWidthsCache[u]||(this._charWidthsCache[u]=t.measureText(n).width),this._charWidthsCache[u]):t.measureText(n).width},_applyFontStyles:function(e){e.fontFamily||(e.fontFamily=this.fontFamily),e.fontSize||(e.fontSize=this.fontSize),e.fontWeight||(e.fontWeight=this.fontWeight),e.fontStyle||(e.fontStyle=this.fontStyle)},_getStyleDeclaration:function(t,n){return this.styles[t]&&this.styles[t][n]?e(this.styles[t][n]):{}},_getWidthOfChar:function(e,t,n,r){if(this.textAlign==="justify"&&/\s/.test(t))return this._getWidthOfSpace(e,n);var i=this._getStyleDeclaration(n,r);this._applyFontStyles(i);var s=this._getCacheProp(t,i);if(this._charWidthsCache[s]&&this.caching)return this._charWidthsCache[s];if(e){e.save();var o=this._applyCharStylesGetWidth(e,t,n,r);return e.restore(),o}},_getHeightOfChar:function(e,t,n,r){return this.styles[n]&&this.styles[n][r]?this.styles[n][r].fontSize||this.fontSize:this.fontSize},_getHeightOfCharAt:function(e,t,n){var r=this._textLines[t][n];return this._getHeightOfChar(e,r,t,n)},_getWidthOfCharsAt:function(e,t,n){var r=0,i,s;for(i=0;i<n;i++)s=this._textLines[t][i],r+=this._getWidthOfChar(e,s,t,i);return r},_getLineWidth:function(e,t){return this.__lineWidths[t]?this.__lineWidths[t]:(this.__lineWidths[t]=this._getWidthOfCharsAt(e,t,this._textLines[t].length),this.__lineWidths[t])},_getWidthOfSpace:function(e,t){if(this.__widthOfSpace[t])return this.__widthOfSpace[t];var n=this._textLines[t],r=this._getWidthOfWords(e,n,t),i=this.width-r,s=n.length-n.replace(/\s+/g,"").length,o=i/s;return this.__widthOfSpace[t]=o,o},_getWidthOfWords:function(e,t,n){var r=0;for(var i=0;i<t.length;i++){var s=t[i];s.match(/\s/)||(r+=this._getWidthOfChar(e,s,n,i))}return r},_getHeightOfLine:function(e,t){if(this.__lineHeights[t])return this.__lineHeights[t];var n=this._textLines[t],r=this._getHeightOfChar(e,n[0],t,0);for(var i=1,s=n.length;i<s;i++){var o=this._getHeightOfChar(e,n[i],t,i);o>r&&(r=o)}return this.__maxFontHeights[t]=r,this.__lineHeights[t]=r*this.lineHeight*this._fontSizeMult,this.__lineHeights[t]},_getTextHeight:function(e){var t=0;for(var n=0,r=this._textLines.length;n<r;n++)t+=this._getHeightOfLine(e,n);return t},_renderTextBoxBackground:function(e){if(!this.backgroundColor)return;e.save(),e.fillStyle=this.backgroundColor,e.fillRect(this._getLeftOffset(),this._getTopOffset(),this.width,this.height),e.restore()},toObject:function(t){return fabric.util.object.extend(this.callSuper("toObject",t),{styles:e(this.styles)})}}),fabric.IText.fromObject=function(t){return new fabric.IText(t.text,e(t))}}(),function(){var e=fabric.util.object.clone;fabric.util.object.extend(fabric.IText.prototype,{initBehavior:function(){this.initAddedHandler(),this.initRemovedHandler(),this.initCursorSelectionHandlers(),this.initDoubleClickSimulation()},initSelectedHandler:function(){this.on("selected",function(){var e=this;setTimeout(function(){e.selected=!0},100)})},initAddedHandler:function(){var e=this;this.on("added",function(){this.canvas&&!this.canvas._hasITextHandlers&&(this.canvas._hasITextHandlers=!0,this._initCanvasHandlers()),e.canvas&&(e.canvas._iTextInstances=e.canvas._iTextInstances||[],e.canvas._iTextInstances.push(e))})},initRemovedHandler:function(){var e=this;this.on("removed",function(){e.canvas&&(e.canvas._iTextInstances=e.canvas._iTextInstances||[],fabric.util.removeFromArray(e.canvas._iTextInstances,e))})},_initCanvasHandlers:function(){var e=this;this.canvas.on("selection:cleared",function(){fabric.IText.prototype.exitEditingOnOthers(e.canvas)}),this.canvas.on("mouse:up",function(){e.canvas._iTextInstances&&e.canvas._iTextInstances.forEach(function(e){e.__isMousedown=!1})}),this.canvas.on("object:selected",function(){fabric.IText.prototype.exitEditingOnOthers(e.canvas)})},_tick:function(){this._currentTickState=this._animateCursor(this,1,this.cursorDuration,"_onTickComplete")},_animateCursor:function(e,t,n,r){var i;return i={isAborted:!1,abort:function(){this.isAborted=!0}},e.animate("_currentCursorOpacity",t,{duration:n,onComplete:function(){i.isAborted||e[r]()},onChange:function(){e.canvas&&(e.canvas.clearContext(e.canvas.contextTop||e.ctx),e.renderCursorOrSelection())},abort:function(){return i.isAborted}}),i},_onTickComplete:function(){var e=this;this._cursorTimeout1&&clearTimeout(this._cursorTimeout1),this._cursorTimeout1=setTimeout(function(){e._currentTickCompleteState=e._animateCursor(e,0,this.cursorDuration/2,"_tick")},100)},initDelayedCursor:function(e){var t=this,n=e?0:this.cursorDelay;this._currentTickState&&this._currentTickState.abort(),this._currentTickCompleteState&&this._currentTickCompleteState.abort(),clearTimeout(this._cursorTimeout1),this._currentCursorOpacity=1,this.canvas&&(this.canvas.clearContext(this.canvas.contextTop||this.ctx),this.renderCursorOrSelection()),this._cursorTimeout2&&clearTimeout(this._cursorTimeout2),this._cursorTimeout2=setTimeout(function(){t._tick()},n)},abortCursorAnimation:function(){this._currentTickState&&this._currentTickState.abort(),this._currentTickCompleteState&&this._currentTickCompleteState.abort(),clearTimeout(this._cursorTimeout1),clearTimeout(this._cursorTimeout2),this._currentCursorOpacity=0,this.canvas&&this.canvas.clearContext(this.canvas.contextTop||this.ctx)},selectAll:function(){this.setSelectionStart(0),this.setSelectionEnd(this.text.length)},getSelectedText:function(){return this.text.slice(this.selectionStart,this.selectionEnd)},findWordBoundaryLeft:function(e){var t=0,n=e-1;if(this._reSpace.test(this.text.charAt(n)))while(this._reSpace.test(this.text.charAt(n)))t++,n--;while(/\S/.test(this.text.charAt(n))&&n>-1)t++,n--;return e-t},findWordBoundaryRight:function(e){var t=0,n=e;if(this._reSpace.test(this.text.charAt(n)))while(this._reSpace.test(this.text.charAt(n)))t++,n++;while(/\S/.test(this.text.charAt(n))&&n<this.text.length)t++,n++;return e+t},findLineBoundaryLeft:function(e){var t=0,n=e-1;while(!/\n/.test(this.text.charAt(n))&&n>-1)t++,n--;return e-t},findLineBoundaryRight:function(e){var t=0,n=e;while(!/\n/.test(this.text.charAt(n))&&n<this.text.length)t++,n++;return e+t},getNumNewLinesInSelectedText:function(){var e=this.getSelectedText(),t=0;for(var n=0,r=e.split(""),i=r.length;n<i;n++)r[n]==="\n"&&t++;return t},searchWordBoundary:function(e,t){var n=this._reSpace.test(this.text.charAt(e))?e-1:e,r=this.text.charAt(n),i=/[ \n\.,;!\?\-]/;while(!i.test(r)&&n>0&&n<this.text.length)n+=t,r=this.text.charAt(n);return i.test(r)&&r!=="\n"&&(n+=t===1?0:1),n},selectWord:function(e){var t=this.searchWordBoundary(e,-1),n=this.searchWordBoundary(e,1);this.setSelectionStart(t),this.setSelectionEnd(n)},selectLine:function(e){var t=this.findLineBoundaryLeft(e),n=this.findLineBoundaryRight(e);this.setSelectionStart(t),this.setSelectionEnd(n)},enterEditing:function(){if(this.isEditing||!this.editable)return;return this.canvas&&this.exitEditingOnOthers(this.canvas),this.isEditing=!0,this.initHiddenTextarea(),this.hiddenTextarea.focus(),this._updateTextarea(),this._saveEditingProps(),this._setEditingProps(),this._tick(),this.fire("editing:entered"),this.canvas?(this.canvas.renderAll(),this.canvas.fire("text:editing:entered",{target:this}),this.initMouseMoveHandler(),this):this},exitEditingOnOthers:function(e){e._iTextInstances&&e._iTextInstances.forEach(function(e){e.selected=!1,e.isEditing&&e.exitEditing()})},initMouseMoveHandler:function(){var e=this;this.canvas.on("mouse:move",function(t){if(!e.__isMousedown||!e.isEditing)return;var n=e.getSelectionStartFromPointer(t.e);n>=e.__selectionStartOnMouseDown?(e.setSelectionStart(e.__selectionStartOnMouseDown),e.setSelectionEnd(n)):(e.setSelectionStart(n),e.setSelectionEnd(e.__selectionStartOnMouseDown))})},_setEditingProps:function(){this.hoverCursor="text",this.canvas&&(this.canvas.defaultCursor=this.canvas.moveCursor="text"),this.borderColor=this.editingBorderColor,this.hasControls=this.selectable=!1,this.lockMovementX=this.lockMovementY=!0},_updateTextarea:function(){if(!this.hiddenTextarea)return;this.hiddenTextarea.value=this.text,this.hiddenTextarea.selectionStart=this.selectionStart,this.hiddenTextarea.selectionEnd=this.selectionEnd},_saveEditingProps:function(){this._savedProps={hasControls:this.hasControls,borderColor:this.borderColor,lockMovementX:this.lockMovementX,lockMovementY:this.lockMovementY,hoverCursor:this.hoverCursor,defaultCursor:this.canvas&&this.canvas.defaultCursor,moveCursor:this.canvas&&this.canvas.moveCursor}},_restoreEditingProps:function(){if(!this._savedProps)return;this.hoverCursor=this._savedProps.overCursor,this.hasControls=this._savedProps.hasControls,this.borderColor=this._savedProps.borderColor,this.lockMovementX=this._savedProps.lockMovementX,this.lockMovementY=this._savedProps.lockMovementY,this.canvas&&(this.canvas.defaultCursor=this._savedProps.defaultCursor,this.canvas.moveCursor=this._savedProps.moveCursor)},exitEditing:function(){return this.selected=!1,this.isEditing=!1,this.selectable=!0,this.selectionEnd=this.selectionStart,this.hiddenTextarea&&this.canvas&&this.hiddenTextarea.parentNode.removeChild(this.hiddenTextarea),this.hiddenTextarea=null,this.abortCursorAnimation(),this._restoreEditingProps(),this._currentCursorOpacity=0,this.fire("editing:exited"),this.canvas&&this.canvas.fire("text:editing:exited",{target:this}),this},_removeExtraneousStyles:function(){for(var e in this.styles)this._textLines[e]||delete this.styles[e]},_removeCharsFromTo:function(e,t){var n=t;while(n!==e){var r=this.get2DCursorLocation(n).charIndex;n--;var i=this.get2DCursorLocation(n).charIndex,s=i>r;s?this.removeStyleObject(s,n+1):this.removeStyleObject(this.get2DCursorLocation(n).charIndex===0,n)}this.text=this.text.slice(0,e)+this.text.slice(t),this._clearCache()},insertChars:function(e,t){var n=this.text.slice(this.selectionStart,this.selectionStart+1)==="\n";this.text=this.text.slice(0,this.selectionStart)+e+this.text.slice(this.selectionEnd),this.selectionStart===this.selectionEnd&&this.insertStyleObjects(e,n,t),this.setSelectionStart(this.selectionStart+e.length),this.setSelectionEnd(this.selectionStart),this._clearCache(),this.canvas&&this.canvas.renderAll(),this.setCoords(),this.fire("changed"),this.canvas&&this.canvas.fire("text:changed",{target:this})},insertNewlineStyleObject:function(t,n,r){this.shiftLineStyles(t,1),this.styles[t+1]||(this.styles[t+1]={});var i=this.styles[t][n-1],s={};if(r)s[0]=e(i),this.styles[t+1]=s;else{for(var o in this.styles[t])parseInt(o,10)>=n&&(s[parseInt(o,10)-n]=this.styles[t][o],delete this.styles[t][o]);this.styles[t+1]=s}this._clearCache()},insertCharStyleObject:function(t,n,r){var i=this.styles[t],s=e(i);n===0&&!r&&(n=1);for(var o in s){var u=parseInt(o,10);u>=n&&(i[u+1]=s[u])}this.styles[t][n]=r||e(i[n-1]),this._clearCache()},insertStyleObjects:function(e,t,n){var r=this.get2DCursorLocation(),i=r.lineIndex,s=r.charIndex;this.styles[i]||(this.styles[i]={}),e==="\n"?this.insertNewlineStyleObject(i,s,t):n?this._insertStyles(this.copiedStyles):this.insertCharStyleObject(i,s)},_insertStyles:function(e){for(var t=0,n=e.length;t<n;t++){var r=this.get2DCursorLocation(this.selectionStart+t),i=r.lineIndex,s=r.charIndex;this.insertCharStyleObject(i,s,e[t])}},shiftLineStyles:function(t,n){var r=e(this.styles);for(var i in this.styles){var s=parseInt(i,10);s>t&&(this.styles[s+n]=r[s])}},removeStyleObject:function(t,n){var r=this.get2DCursorLocation(n),i=r.lineIndex,s=r.charIndex;if(t){var o=this._textLines[i-1],u=o?o.length:0;this.styles[i-1]||(this.styles[i-1]={});for(s in this.styles[i])this.styles[i-1][parseInt(s,10)+u]=this.styles[i][s];this.shiftLineStyles(i,-1)}else{var a=this.styles[i];if(a){var f=this.selectionStart===this.selectionEnd?-1:0;delete a[s+f]}var l=e(a);for(var c in l){var h=parseInt(c,10);h>=s&&h!==0&&(a[h-1]=l[h],delete a[h])}}},insertNewline:function(){this.insertChars("\n")}})}(),fabric.util.object.extend(fabric.IText.prototype,{initDoubleClickSimulation:function(){this.__lastClickTime=+(new Date),this.__lastLastClickTime=+(new Date),this.__lastPointer={},this.on("mousedown",this.onMouseDown.bind(this))},onMouseDown:function(e){this.__newClickTime=+(new Date);var t=this.canvas.getPointer(e.e);this.isTripleClick(t)?(this.fire("tripleclick",e),this._stopEvent(e.e)):this.isDoubleClick(t)&&(this.fire("dblclick",e),this._stopEvent(e.e)),this.__lastLastClickTime=this.__lastClickTime,this.__lastClickTime=this.__newClickTime,this.__lastPointer=t,this.__lastIsEditing=this.isEditing,this.__lastSelected=this.selected},isDoubleClick:function(e){return this.__newClickTime-this.__lastClickTime<500&&this.__lastPointer.x===e.x&&this.__lastPointer.y===e.y&&this.__lastIsEditing},isTripleClick:function(e){return this.__newClickTime-this.__lastClickTime<500&&this.__lastClickTime-this.__lastLastClickTime<500&&this.__lastPointer.x===e.x&&this.__lastPointer.y===e.y},_stopEvent:function(e){e.preventDefault&&e.preventDefault(),e.stopPropagation&&e.stopPropagation()},initCursorSelectionHandlers:function(){this.initSelectedHandler(),this.initMousedownHandler(),this.initMouseupHandler(),this.initClicks()},initClicks:function(){this.on("dblclick",function(e){this.selectWord(this.getSelectionStartFromPointer(e.e))}),this.on("tripleclick",function(e){this.selectLine(this.getSelectionStartFromPointer(e.e))})},initMousedownHandler:function(){this.on("mousedown",function(e){var t=this.canvas.getPointer(e.e);this.__mousedownX=t.x,this.__mousedownY=t.y,this.__isMousedown=!0,this.hiddenTextarea&&this.canvas&&this.canvas.wrapperEl.appendChild(this.hiddenTextarea),this.selected&&this.setCursorByClick(e.e),this.isEditing&&(this.__selectionStartOnMouseDown=this.selectionStart,this.initDelayedCursor(!0))})},_isObjectMoved:function(e){var t=this.canvas.getPointer(e);return this.__mousedownX!==t.x||this.__mousedownY!==t.y},initMouseupHandler:function(){this.on("mouseup",function(e){this.__isMousedown=!1;if(this._isObjectMoved(e.e))return;this.__lastSelected&&(this.enterEditing(),this.initDelayedCursor(!0)),this.selected=!0})},setCursorByClick:function(e){var t=this.getSelectionStartFromPointer(e);e.shiftKey?t<this.selectionStart?(this.setSelectionEnd(this.selectionStart),this.setSelectionStart(t)):this.setSelectionEnd(t):(this.setSelectionStart(t),this.setSelectionEnd(t))},_getLocalRotatedPointer:function(e){var t=this.canvas.getPointer(e),n=new fabric.Point(t.x,t.y),r=new fabric.Point(this.left,this.top),i=fabric.util.rotatePoint(n,r,fabric.util.degreesToRadians(-this.angle));return this.getLocalPointer(e,i)},getSelectionStartFromPointer:function(e){var t=this._getLocalRotatedPointer(e),n=0,r=0,i=0,s=0,o,u;for(var a=0,f=this._textLines.length;a<f;a++){u=this._textLines[a].split(""),i+=this._getHeightOfLine(this.ctx,a)*this.scaleY;var l=this._getLineWidth(this.ctx,a),c=this._getLineLeftOffset(l);r=c*this.scaleX,this.flipX&&(this._textLines[a]=u.reverse().join(""));for(var h=0,p=u.length;h<p;h++){var d=u[h];n=r,r+=this._getWidthOfChar(this.ctx,d,a,this.flipX?p-h:h)*this.scaleX;if(i<=t.y||r<=t.x){s++;continue}return this._getNewSelectionStartFromOffset(t,n,r,s+a,p)}if(t.y<i)return this._getNewSelectionStartFromOffset(t,n,r,s+a,p)}if(typeof o=="undefined")return this.text.length},_getNewSelectionStartFromOffset:function(e,t,n,r,i){var s=e.x-t,o=n-e.x,u=o>s?0:1,a=r+u;return this.flipX&&(a=i-a),a>this.text.length&&(a=this.text.length),a}}),fabric.util.object.extend(fabric.IText.prototype,{initHiddenTextarea:function(){this.hiddenTextarea=fabric.document.createElement("textarea"),this.hiddenTextarea.setAttribute("autocapitalize","off"),this.hiddenTextarea.style.cssText="position: fixed; bottom: 20px; left: 0px; opacity: 0; width: 0px; height: 0px; z-index: -999;",fabric.document.body.appendChild(this.hiddenTextarea),fabric.util.addListener(this.hiddenTextarea,"keydown",this.onKeyDown.bind(this)),fabric.util.addListener(this.hiddenTextarea,"keypress",this.onKeyPress.bind(this)),fabric.util.addListener(this.hiddenTextarea,"copy",this.copy.bind(this)),fabric.util.addListener(this.hiddenTextarea,"paste",this.paste.bind(this)),!this._clickHandlerInitialized&&this.canvas&&(fabric.util.addListener(this.canvas.upperCanvasEl,"click",this.onClick.bind(this)),this._clickHandlerInitialized=!0)},_keysMap:{8:"removeChars",9:"exitEditing",27:"exitEditing",13:"insertNewline",33:"moveCursorUp",34:"moveCursorDown",35:"moveCursorRight",36:"moveCursorLeft",37:"moveCursorLeft",38:"moveCursorUp",39:"moveCursorRight",40:"moveCursorDown",46:"forwardDelete"},_ctrlKeysMap:{65:"selectAll",88:"cut"},onClick:function(){this.hiddenTextarea&&this.hiddenTextarea.focus()},onKeyDown:function(e){if(!this.isEditing)return;if(e.keyCode in this._keysMap)this[this._keysMap[e.keyCode]](e);else{if(!(e.keyCode in this._ctrlKeysMap&&(e.ctrlKey||e.metaKey)))return;this[this._ctrlKeysMap[e.keyCode]](e)}e.stopImmediatePropagation(),e.preventDefault(),this.canvas&&this.canvas.renderAll()},forwardDelete:function(e){this.selectionStart===this.selectionEnd&&this.moveCursorRight(e),this.removeChars(e)},copy:function(e){var t=this.getSelectedText(),n=this._getClipboardData(e);n&&n.setData("text",t),this.copiedText=t,this.copiedStyles=this.getSelectionStyles(this.selectionStart,this.selectionEnd)},paste:function(e){var t=null,n=this._getClipboardData(e);n?t=n.getData("text"):t=this.copiedText,t&&this.insertChars(t,!0)},cut:function(e){if(this.selectionStart===this.selectionEnd)return;this.copy(),this.removeChars(e)},_getClipboardData:function(e){return e&&(e.clipboardData||fabric.window.clipboardData)},onKeyPress:function(e){if(!this.isEditing||e.metaKey||e.ctrlKey)return;e.which!==0&&this.insertChars(String.fromCharCode(e.which)),e.stopPropagation()},getDownCursorOffset:function(e,t){var n=t?this.selectionEnd:this.selectionStart,r,i,s=this.text.slice(0,n),o=this.text.slice(n),u=s.slice(s.lastIndexOf("\n")+1),a=o.match(/(.*)\n?/)[1],f=(o.match(/.*\n(.*)\n?/)||{})[1]||"",l=this.get2DCursorLocation(n);if(l.lineIndex===this._textLines.length-1||e.metaKey||e.keyCode===34)return this.text.length-n;var c=this._getLineWidth(this.ctx,l.lineIndex);i=this._getLineLeftOffset(c);var h=i,p=l.lineIndex;for(var d=0,v=u.length;d<v;d++)r=u[d],h+=this._getWidthOfChar(this.ctx,r,p,d);var m=this._getIndexOnNextLine(l,f,h);return a.length+1+m},_getIndexOnNextLine:function(e,t,n){var r=e.lineIndex+1,i=this._getLineWidth(this.ctx,r),s=this._getLineLeftOffset(i),o=s,u=0,a;for(var f=0,l=t.length;f<l;f++){var c=t[f],h=this._getWidthOfChar(this.ctx,c,r,f);o+=h;if(o>n){a=!0;var p=o-h,d=o,v=Math.abs(p-n),m=Math.abs(d-n);u=m<v?f+1:f;break}}return a||(u=t.length),u},moveCursorDown:function(e){this.abortCursorAnimation(),this._currentCursorOpacity=1;var t=this.getDownCursorOffset(e,this._selectionDirection==="right");e.shiftKey?this.moveCursorDownWithShift(t):this.moveCursorDownWithoutShift(t),this.initDelayedCursor()},moveCursorDownWithoutShift:function(e){this._selectionDirection="right",this.setSelectionStart(this.selectionStart+e),this.setSelectionEnd(this.selectionStart)},swapSelectionPoints:function(){var e=this.selectionEnd;this.setSelectionEnd(this.selectionStart),this.setSelectionStart(e)},moveCursorDownWithShift:function(e){this.selectionEnd===this.selectionStart&&(this._selectionDirection="right"),this._selectionDirection==="right"?this.setSelectionEnd(this.selectionEnd+e):this.setSelectionStart(this.selectionStart+e),this.selectionEnd<this.selectionStart&&this._selectionDirection==="left"&&(this.swapSelectionPoints(),this._selectionDirection="right"),this.selectionEnd>this.text.length&&this.setSelectionEnd(this.text.length)},getUpCursorOffset:function(e,t){var n=t?this.selectionEnd:this.selectionStart,r=this.get2DCursorLocation(n);if(r.lineIndex===0||e.metaKey||e.keyCode===33)return n;var i=this.text.slice(0,n),s=i.slice(i.lastIndexOf("\n")+1),o=(i.match(/\n?(.*)\n.*$/)||{})[1]||"",u,a=this._getLineWidth(this.ctx,r.lineIndex),f=this._getLineLeftOffset(a),l=f,c=r.lineIndex;for(var h=0,p=s.length;h<p;h++)u=s[h],l+=this._getWidthOfChar(this.ctx,u,c,h);var d=this._getIndexOnPrevLine(r,o,l);return o.length-d+s.length},_getIndexOnPrevLine:function(e,t,n){var r=e.lineIndex-1,i=this._getLineWidth(this.ctx,r),s=this._getLineLeftOffset(i),o=s,u=0,a;for(var f=0,l=t.length;f<l;f++){var c=t[f],h=this._getWidthOfChar(this.ctx,c,r,f);o+=h;if(o>n){a=!0;var p=o-h,d=o,v=Math.abs(p-n),m=Math.abs(d-n);u=m<v?f:f-1;break}}return a||(u=t.length-1),u},moveCursorUp:function(e){this.abortCursorAnimation(),this._currentCursorOpacity=1;var t=this.getUpCursorOffset(e,this._selectionDirection==="right");e.shiftKey?this.moveCursorUpWithShift(t):this.moveCursorUpWithoutShift(t),this.initDelayedCursor()},moveCursorUpWithShift:function(e){this.selectionEnd===this.selectionStart&&(this._selectionDirection="left"),this._selectionDirection==="right"?this.setSelectionEnd(this.selectionEnd-e):this.setSelectionStart(this.selectionStart-e),this.selectionEnd<this.selectionStart&&this._selectionDirection==="right"&&(this.swapSelectionPoints(),this._selectionDirection="left")},moveCursorUpWithoutShift:function(e){this.selectionStart===this.selectionEnd&&this.setSelectionStart(this.selectionStart-e),this.setSelectionEnd(this.selectionStart),this._selectionDirection="left"},moveCursorLeft:function(e){if(this.selectionStart===0&&this.selectionEnd===0)return;this.abortCursorAnimation(),this._currentCursorOpacity=1,e.shiftKey?this.moveCursorLeftWithShift(e):this.moveCursorLeftWithoutShift(e),this.initDelayedCursor()},_move:function(e,t,n){var r=t==="selectionStart"?"setSelectionStart":"setSelectionEnd";e.altKey?this[r](this["findWordBoundary"+n](this[t])):e.metaKey||e.keyCode===35||e.keyCode===36?this[r](this["findLineBoundary"+n](this[t])):this[r](this[t]+(n==="Left"?-1:1))},_moveLeft:function(e,t){this._move(e,t,"Left")},_moveRight:function(e,t){this._move(e,t,"Right")},moveCursorLeftWithoutShift:function(e){this._selectionDirection="left",this.selectionEnd===this.selectionStart&&this._moveLeft(e,"selectionStart"),this.setSelectionEnd(this.selectionStart)},moveCursorLeftWithShift:function(e){this._selectionDirection==="right"&&this.selectionStart!==this.selectionEnd?this._moveLeft(e,"selectionEnd"):(this._selectionDirection="left",this._moveLeft(e,"selectionStart"),this.text.charAt(this.selectionStart)==="\n"&&this.setSelectionStart(this.selectionStart-1))},moveCursorRight:function(e){if(this.selectionStart>=this.text.length&&this.selectionEnd>=this.text.length)return;this.abortCursorAnimation(),this._currentCursorOpacity=1,e.shiftKey?this.moveCursorRightWithShift(e):this.moveCursorRightWithoutShift(e),this.initDelayedCursor()},moveCursorRightWithShift:function(e){this._selectionDirection==="left"&&this.selectionStart!==this.selectionEnd?this._moveRight(e,"selectionStart"):(this._selectionDirection="right",this._moveRight(e,"selectionEnd"),this.text.charAt(this.selectionEnd-1)==="\n"&&this.setSelectionEnd(this.selectionEnd+1))},moveCursorRightWithoutShift:function(e){this._selectionDirection="right",this.selectionStart===this.selectionEnd?(this._moveRight(e,"selectionStart"),this.setSelectionEnd(this.selectionStart)):(this.setSelectionEnd(this.selectionEnd+this.getNumNewLinesInSelectedText()),this.setSelectionStart(this.selectionEnd))},removeChars:function(e){this.selectionStart===this.selectionEnd?this._removeCharsNearCursor(e):this._removeCharsFromTo(this.selectionStart,this.selectionEnd),this.setSelectionEnd(this.selectionStart),this._removeExtraneousStyles(),this._clearCache(),this.canvas&&this.canvas.renderAll(),this.setCoords(),this.fire("changed"),this.canvas&&this.canvas.fire("text:changed",{target:this})},_removeCharsNearCursor:function(e){if(this.selectionStart!==0)if(e.metaKey){var t=this.findLineBoundaryLeft(this.selectionStart);this._removeCharsFromTo(t,this.selectionStart),this.setSelectionStart(t)}else if(e.altKey){var n=this.findWordBoundaryLeft(this.selectionStart);this._removeCharsFromTo(n,this.selectionStart),this.setSelectionStart(n)}else{var r=this.text.slice(this.selectionStart-1,this.selectionStart)==="\n";this.removeStyleObject(r),this.setSelectionStart(this.selectionStart-1),this.text=this.text.slice(0,this.selectionStart)+this.text.slice(this.selectionStart+1)}}}),fabric.util.object.extend(fabric.IText.prototype,{_setSVGTextLineText:function(e,t,n,r,i,s){this.styles[e]?this._setSVGTextLineChars(e,t,n,r,s):this.callSuper("_setSVGTextLineText",e,t,n,r,i)},_setSVGTextLineChars:function(e,t,n,r,i){var s=this._textLines[e].split(""),o=0,u=this._getSVGLineLeftOffset(e)-this.width/2,a=this._getSVGLineTopOffset(e),f=this._getHeightOfLine(this.ctx,e);for(var l=0,c=s.length;l<c;l++){var h=this.styles[e][l]||{};t.push(this._createTextCharSpan(s[l],h,u,a.lineTop+a.offset,o));var p=this._getWidthOfChar(this.ctx,s[l],e,l);h.textBackgroundColor&&i.push(this._createTextCharBg(h,u,a.lineTop,f,p,o)),o+=p}},_getSVGLineLeftOffset:function(e){return fabric.util.toFixed(this._getLineLeftOffset(this.__lineWidths[e]),2)},_getSVGLineTopOffset:function(e){var t=0,n=0;for(var r=0;r<e;r++)t+=this._getHeightOfLine(this.ctx,r);return n=this._getHeightOfLine(this.ctx,r),{lineTop:t,offset:(this._fontSizeMult-this._fontSizeFraction)*n/(this.lineHeight*this._fontSizeMult)}},_createTextCharBg:function(e,t,n,r,i,s){return['<rect fill="',e.textBackgroundColor,'" x="',t+s,'" y="',n-this.height/2,'" width="',i,'" height="',r/this.lineHeight,'"></rect>'].join("")},_createTextCharSpan:function(e,t,n,r,i){var s=this.getSvgStyles.call(fabric.util.object.extend({visible:!0,fill:this.fill,stroke:this.stroke,type:"text"},t));return['<tspan x="',n+i,'" y="',r-this.height/2,'" ',t.fontFamily?'font-family="'+t.fontFamily.replace(/"/g,"'")+'" ':"",t.fontSize?'font-size="'+t.fontSize+'" ':"",t.fontStyle?'font-style="'+t.fontStyle+'" ':"",t.fontWeight?'font-weight="'+t.fontWeight+'" ':"",t.textDecoration?'text-decoration="'+t.textDecoration+'" ':"",'style="',s,'">',fabric.util.string.escapeXml(e),"</tspan>"].join("")}}),function(){function request(e,t,n){var r=URL.parse(e);r.port||(r.port=r.protocol.indexOf("https:")===0?443:80);var i=r.protocol.indexOf("https:")===0?HTTPS:HTTP,s=i.request({hostname:r.hostname,port:r.port,path:r.path,method:"GET"},function(e){var r="";t&&e.setEncoding(t),e.on("end",function(){n(r)}),e.on("data",function(t){e.statusCode===200&&(r+=t)})});s.on("error",function(e){e.errno===process.ECONNREFUSED?fabric.log("ECONNREFUSED: connection refused to "+r.hostname+":"+r.port):fabric.log(e.message)}),s.end()}function requestFs(e,t){var n=require("fs");n.readFile(e,function(e,n){if(e)throw fabric.log(e),e;t(n)})}if(typeof document!="undefined"&&typeof window!="undefined")return;var DOMParser=require("xmldom").DOMParser,URL=require("url"),HTTP=require("http"),HTTPS=require("https"),Canvas=require("canvas"),Image=require("canvas").Image;fabric.util.loadImage=function(e,t,n){function r(r){i.src=new Buffer(r,"binary"),i._src=e,t&&t.call(n,i)}var i=new Image;e&&(e instanceof Buffer||e.indexOf("data")===0)?(i.src=i._src=e,t&&t.call(n,i)):e&&e.indexOf("http")!==0?requestFs(e,r):e?request(e,"binary",r):t&&t.call(n,e)},fabric.loadSVGFromURL=function(e,t,n){e=e.replace(/^\n\s*/,"").replace(/\?.*$/,"").trim(),e.indexOf("http")!==0?requestFs(e,function(e){fabric.loadSVGFromString(e.toString(),t,n)}):request(e,"",function(e){fabric.loadSVGFromString(e,t,n)})},fabric.loadSVGFromString=function(e,t,n){var r=(new DOMParser).parseFromString(e);fabric.parseSVGDocument(r.documentElement,function(e,n){t&&t(e,n)},n)},fabric.util.getScript=function(url,callback){request(url,"",function(body){eval(body),callback&&callback()})},fabric.Image.fromObject=function(e,t){fabric.util.loadImage(e.src,function(n){var r=new fabric.Image(n);r._initConfig(e),r._initFilters(e,function(e){r.filters=e||[],t&&t(r)})})},fabric.createCanvasForNode=function(e,t,n,r){r=r||n;var i=fabric.document.createElement("canvas"),s=new Canvas(e||600,t||600,r);i.style={},i.width=s.width,i.height=s.height;var o=fabric.Canvas||fabric.StaticCanvas,u=new o(i,n);return u.contextContainer=s.getContext("2d"),u.nodeCanvas=s,u.Font=Canvas.Font,u},fabric.StaticCanvas.prototype.createPNGStream=function(){return this.nodeCanvas.createPNGStream()},fabric.StaticCanvas.prototype.createJPEGStream=function(e){return this.nodeCanvas.createJPEGStream(e)};var origSetWidth=fabric.StaticCanvas.prototype.setWidth;fabric.StaticCanvas.prototype.setWidth=function(e,t){return origSetWidth.call(this,e,t),this.nodeCanvas.width=e,this},fabric.Canvas&&(fabric.Canvas.prototype.setWidth=fabric.StaticCanvas.prototype.setWidth);var origSetHeight=fabric.StaticCanvas.prototype.setHeight;fabric.StaticCanvas.prototype.setHeight=function(e,t){return origSetHeight.call(this,e,t),this.nodeCanvas.height=e,this},fabric.Canvas&&(fabric.Canvas.prototype.setHeight=fabric.StaticCanvas.prototype.setHeight)}();
 /**
+ *  Trip.js
+ *
+ *  This is a jQuery plugin that can help you customize your tutorial trip
+ *  with full flexibilities.
+ *
+ *  Version: 3.1.0
+ *
+ *  Author: EragonJ <eragonj@eragonj.me>
+ *  Blog: http://eragonj.me
+ *
+ *  @preserve
+ */
+
+(function(exports) {
+
+  /**
+   * TripParser - this is the parser that helps us parse DOM elements and
+   * return needed information to TripCore. By doing so, users can easily
+   * define their own trips from HTML.
+   *
+   * @class TripParser
+   */
+  function TripParser() {
+    this._DEFAULT_TRIP_NODES_SELECTOR = '[data-trip]';
+
+    this._DEFAULT_TRIP_POSITION = 'n';
+    this._DEFAULT_TRIP_ANIMATION = 'tada';
+  }
+
+  TripParser.prototype = {
+    /**
+     * We will find out all pre-defined DOM elements from DOM tree.
+     *
+     * @memberOf TripParser
+     * @type {Function}
+     * @return {Array} Array of Element
+     */
+    _getAllTripNodes: function(selector) {
+      return document.querySelectorAll(selector);
+    },
+
+    /**
+     * we will use this function to parse out all needed information
+     * and wrap them into a tripData object then pass it out.
+     *
+     * TODO - http://caniuse.com/#search=dataset
+     * IE 8~10 can't use dataset directly, so we may need to use
+     * getAttribute for this case later.
+     *
+     * @memberOf TripParser
+     * @type {Function}
+     * @param {Element} node
+     * @return {Object} TripData
+     */
+    _parseTripData: function(node) {
+      var tripIndex = node.dataset.tripIndex;
+      var tripContent = node.dataset.tripContent;
+      var tripDelay = node.dataset.tripDelay;
+      var tripPosition =
+        node.dataset.tripPosition || this._DEFAULT_TRIP_POSITION;
+      var tripAnimation =
+        node.dataset.tripAnimation || this._DEFAULT_TRIP_ANIMATION;
+
+      if (!node || typeof tripIndex === 'undefined' || tripContent === '') {
+        // Let's ignore this tripData
+        return null;
+      }
+      else {
+        tripIndex = parseInt(tripIndex, 10);
+        tripDelay = parseInt(tripDelay, 10);
+
+        // TODO
+        // we can try to extend this tripData list
+        //
+        // We have to put tripIndex as its internal property so that
+        // we can sort them by their indexes.
+        var tripObject = {};
+        tripObject.sel = node;
+        tripObject._index = tripIndex;
+        tripObject.position = tripPosition;
+        tripObject.content = tripContent;
+
+        if (tripDelay && !isNaN(tripDelay)) {
+          tripObject.delay = tripDelay;
+        }
+
+        return tripObject;
+      }
+    },
+
+    _sort: function(tripData) {
+      tripData.sort(function(dataA, dataB) {
+        return dataA._index - dataB._index;
+      });
+    },
+
+    /**
+     * This is the main entry point to use tripParser.
+     *
+     * @memberOf TripParser
+     * @type {Function}
+     * @param {String} selector - selector to matches nodes from DOM tree
+     * @return {Array} Array of tripDatas
+     */
+    parse: function(selector) {
+      if (typeof selector !== 'string') {
+        throw 'Please check your selector - ' + selector + ' , and make sure ' +
+          ' it is String type';
+      }
+
+      selector = (selector === 'default') ?
+        this._DEFAULT_TRIP_NODES_SELECTOR : selector;
+
+      var that = this;
+      var tripData = [];
+      var nodes = this._getAllTripNodes(selector);
+
+      if (nodes) {
+        [].forEach.call(nodes, function(node) {
+          var tripDataForThatNode = that._parseTripData(node);
+          if (tripDataForThatNode) {
+            tripData.push(tripDataForThatNode);
+          }
+        });
+      }
+
+      // TODO
+      // we have to use one more function to clenaup broken steps here to make
+      // sure all stesp are increase from 0 to n-1. Otherwise, Trip.core may
+      // get broken.
+
+      this._sort(tripData);
+      return tripData;
+    }
+  };
+
+  exports.TripParser = new TripParser();
+}(window));
+
+(function(exports, $) {
+
+  var CHECKED_ANIMATIONS = [
+    'flash', 'bounce', 'shake', 'tada',
+    'fadeIn', 'fadeInUp', 'fadeInDown',
+    'fadeInLeft', 'fadeInRight', 'fadeInUpBig', 'fadeInDownBig',
+    'fadeInLeftBig', 'fadeInRightBig', 'bounceIn', 'bounceInDown',
+    'bounceInUp', 'bounceInLeft', 'bounceInRight', 'rotateIn',
+    'rotateInDownLeft', 'rotateInDownRight', 'rotateInUpLeft',
+    'rotateInUpRight'
+  ];
+
+  /**
+   * Trip
+   *
+   * @class Trip
+   * @param {Array.<Object>} tripData
+   * @param {Object} userOptions
+   */
+  var Trip = function() {
+    var tripData;
+    var userOptions;
+
+    // () - default parser mode without configurations
+    if (arguments.length === 0) {
+      tripData = window.TripParser.parse('default');
+      userOptions = {};
+    }
+    else if (arguments.length === 1) {
+      // ([]) - programming mode without configurations
+      if (this.isArray(arguments[0])) {
+        tripData = arguments[0];
+        userOptions = {};
+      }
+      // ({}) - default parser mode with configurations
+      else if (this.isObject(arguments[0])) {
+        tripData = window.TripParser.parse('default');
+        userOptions = arguments[0];
+      }
+      // ('.trip-nodes') - customized parser mode without configurations
+      else if (this.isString(arguments[0])) {
+        tripData = window.TripParser.parse(arguments[0]);
+        userOptions = {};
+      }
+      // we don't support other formats here, so let's throw error here
+      else {
+        throw 'Please check documents for passing parameters, you may pass' +
+          ' wrong parameters into constructor function !';
+      }
+    }
+    // Users pass tripData directly from codebase
+    else {
+      // ([], {}) - programming mode with configurations
+      if (this.isArray(arguments[0])) {
+        tripData = arguments[0];
+      }
+      // ('.trip-nodes', {}) - customized parser mode with configurations
+      else if (this.isString(arguments[0])) {
+        tripData = window.TripParser.parse(arguments[0]);
+      }
+      userOptions = arguments[1];
+    }
+
+    /**
+     * It is used to keep user and default settings.
+     *
+     * @memberOf Trip
+     * @type {Object}
+     */
+    this.settings = $.extend({
+      // basic config
+      tripIndex: 0,
+      tripTheme: 'black',
+      backToTopWhenEnded: false,
+      overlayHolder: 'body',
+      overlayZindex: 99999,
+      delay: 1000,
+      enableKeyBinding: true,
+      enableAnimation: true,
+      showCloseBox: false,
+      showHeader: false,
+      skipUndefinedTrip: false,
+
+      // navigation
+      showNavigation: false,
+      canGoNext: true,
+      canGoPrev: true,
+
+      // labels
+      nextLabel: 'Next',
+      prevLabel: 'Back',
+      finishLabel: 'Dismiss',
+      closeBoxLabel: '&#215;',
+      header: 'Step {{tripIndex}}',
+
+      // callbacks for whole process
+      onStart: $.noop,
+      onEnd: $.noop,
+
+      // callbacks for each trip
+      onTripStart: $.noop,
+      onTripEnd: $.noop,
+      onTripStop: $.noop,
+      onTripPause: $.noop,
+      onTripResume: $.noop,
+      onTripChange: $.noop,
+      onTripClose: $.noop,
+
+      // animation
+      animation: 'tada',
+
+      // customizable HTML
+      tripBlockHTML: [
+        '<div class="trip-block">',
+          '<a href="#" class="trip-close"></a>',
+          '<div class="trip-header"></div>',
+          '<div class="trip-content"></div>',
+          '<div class="trip-progress-wrapper">',
+            '<div class="trip-progress-bar"></div>',
+            '<a href="#" class="trip-prev"></a>',
+            '<a href="#" class="trip-next"></a>',
+          '</div>',
+        '</div>'
+      ]
+    }, userOptions);
+
+    this.tripData = tripData;
+
+    // used SELs
+    this.$tripBlock = null;
+    this.$overlay = null;
+    this.$bar = null;
+    this.$root = $('body, html');
+
+    // save the current trip index
+    this.tripIndex = this.settings.tripIndex;
+    this.tripDirection = 'next';
+    this.timer = null;
+    this.progressing = false;
+
+    // about expose
+    this.hasExpose = false;
+
+    // contants
+    this.CONSTANTS = {
+      LEFT_ARROW: 37,
+      UP_ARROW: 38,
+      RIGHT_ARROW: 39,
+      DOWN_ARROW: 40,
+      ESC: 27,
+      SPACE: 32,
+      TRIP_BLOCK_OFFSET_VERTICAL: 10,
+      TRIP_BLOCK_OFFSET_HORIZONTAL: 10,
+      RESIZE_TIMEOUT: 200
+    };
+
+    this.console = window.console || {};
+  };
+
+  Trip.prototype = {
+    /**
+     * This is used to preInit Trip.js. For current use, we will try to
+     * override this.console if there is no window.console like IE.
+     *
+     * @memberOf Trip
+     * @type {Function}
+     */
+    preInit: function() {
+      if (typeof this.console === 'undefined') {
+        var that = this;
+        var methods = ['log', 'warn', 'debug', 'info', 'error'];
+
+        $.each(methods, function(i, methodName) {
+          that.console[methodName] = $.noop;
+        });
+      }
+    },
+
+    /**
+     * Expose element which has hasExpose property.
+     *
+     * @memberOf Trip
+     * @type {Funtion}
+     */
+    showExpose: function() {
+      var o = this.getCurrentTripObject();
+      var oldCSS;
+      var newCSS;
+      var $sel;
+
+      if (typeof o.expose === 'string') {
+        $sel = $(o.expose);
+      }
+      else if (o.expose instanceof $) {
+        $sel = o.expose;
+      }
+      else {
+        $sel = $(o.sel);
+      }
+
+      this.hasExpose = true;
+
+      // NOTE: issue #68
+      // we have to make sure $sel does exist because we may have no
+      // $sel when using special directions
+      if ($sel.get(0) !== undefined) {
+        oldCSS = {
+          position: $sel.css('position'),
+          zIndex: $sel.css('z-Index')
+        };
+
+        newCSS = {
+          position: (function() {
+            // NOTE: issue #63
+            // We can't direclty use 'relative' if the original element
+            // is using properties other than 'relative' because
+            // this would break the UI.
+            if (['absolute', 'fixed'].indexOf(oldCSS.position) > -1) {
+              return oldCSS.position;
+            }
+            else {
+              return 'relative';
+            }
+          }()),
+          // we have to make it higher than the overlay
+          zIndex: this.settings.overlayZindex + 1
+        };
+
+        $sel
+          .data('trip-old-css', oldCSS)
+          .css(newCSS)
+          .addClass('trip-exposed');
+      }
+
+      this.$overlay.show();
+    },
+
+    /**
+     * Make exposed element back to normal state and hide overlay.
+     *
+     * @memberOf Trip
+     * @type {Funtion}
+     */
+    hideExpose: function() {
+      var $exposedSel = $('.trip-exposed');
+      this.hasExpose = false;
+
+      // NOTE: issue #68
+      // we have to make sure $sel does exist because we may have no
+      // $sel when using special directions
+      if ($exposedSel.get(0) !== undefined) {
+        var oldCSS = $exposedSel.data('trip-old-css');
+
+        $exposedSel
+          .css(oldCSS)
+          .removeClass('trip-exposed');
+      }
+
+      this.$overlay.hide();
+    },
+
+    /**
+     * When users resize its browser, we will rerun Trip and restart the timer.
+     * TODO: We have to debounce this function later to make performance better.
+     *
+     * @memberOf Trip
+     * @type {Function}
+     */
+    bindResizeEvents: function() {
+      var that = this;
+      var timer;
+
+      $(window).on('resize.Trip', function() {
+        window.clearTimeout(timer);
+        timer = window.setTimeout(function() {
+          that.run();
+        }, that.CONSTANTS.RESIZE_TIMEOUT);
+      });
+    },
+
+    /**
+     * Remove resize event from window.
+     *
+     * @memberOf Trip
+     * @type {Function}
+     */
+    unbindResizeEvents: function() {
+      $(window).off('resize.Trip');
+    },
+
+    /**
+     * Bind keydown events on document.
+     *
+     * @memberOf Trip
+     * @type {Function}
+     */
+    bindKeyEvents: function() {
+      var that = this;
+      $(document).on({
+        'keydown.Trip': function(e) {
+          // `this` will be bound to #document DOM element here
+          that.keyEvent.call(that, e);
+        }
+      });
+    },
+
+    /**
+     * Remove keydown events from document.
+     *
+     * @memberOf Trip
+     * @type {Function}
+     */
+    unbindKeyEvents: function() {
+      $(document).off('keydown.Trip');
+    },
+
+    /**
+     * Bound keydown events. We will do specific actions when matched keys
+     * are pressed by user.
+     *
+     * @memberOf Trip
+     * @type {function}
+     * @param {Event} e
+     */
+    keyEvent: function(e) {
+      switch (e.which) {
+        case this.CONSTANTS.ESC:
+          this.stop();
+          break;
+
+        case this.CONSTANTS.SPACE:
+          // space will make the page jump
+          e.preventDefault();
+          this.pause();
+          break;
+
+        case this.CONSTANTS.LEFT_ARROW:
+        case this.CONSTANTS.UP_ARROW:
+          this.prev();
+          break;
+
+        case this.CONSTANTS.RIGHT_ARROW:
+        case this.CONSTANTS.DOWN_ARROW:
+          this.next();
+          break;
+      }
+    },
+
+    /**
+     * Stop API, which will stop the trip.
+     *
+     * @memberOf Trip
+     * @type {Function}
+     * @public
+     */
+    stop: function() {
+      if (this.timer) {
+        this.timer.stop();
+      }
+
+      if (this.hasExpose) {
+        this.hideExpose();
+      }
+
+      this.hideTripBlock();
+      this.unbindKeyEvents();
+      this.unbindResizeEvents();
+
+      var tripObject = this.getCurrentTripObject();
+      var tripStop = tripObject.onTripStop || this.settings.onTripStop;
+      tripStop(this.tripIndex, tripObject);
+
+      this.settings.onEnd(this.tripIndex, tripObject);
+
+      // We have to reset tripIndex in stop action too
+      this.tripIndex = this.settings.tripIndex;
+    },
+
+    /**
+     * This is an wrapper for pause and resume API.
+     *
+     * @memberOf Trip
+     * @type {Function}
+     */
+    pauseOrResume: function() {
+      if (this.progressing) {
+        this.timer.pause();
+        this.pauseProgressBar();
+      }
+      else {
+        var remainingTime = this.timer.resume();
+        this.resumeProgressBar(remainingTime);
+      }
+      this.progressing = !this.progressing;
+    },
+
+    /**
+     * pause API, which will pause the trip.
+     *
+     * @memberOf Trip
+     * @type {Function}
+     * @public
+     */
+    pause: function() {
+      this.pauseOrResume();
+      var tripObject = this.getCurrentTripObject();
+      var tripPause = tripObject.onTripPause || this.settings.onTripPause;
+      tripPause(this.tripIndex, tripObject);
+    },
+
+    /**
+     * pause API, which will pause the trip.
+     *
+     * @memberOf Trip
+     * @type {Function}
+     * @public
+     */
+    resume: function() {
+      this.pauseOrResume();
+      var tripObject = this.getCurrentTripObject();
+      var tripResume = tripObject.onTripResume || this.settings.onTripResume;
+      tripResume(this.tripIndex, tripObject);
+    },
+
+    /**
+     * next API, which will jump to next the trip.
+     *
+     * @memberOf Trip
+     * @type {Function}
+     * @public
+     */
+    next: function() {
+      var that = this;
+      // We have to make sure we can go next first,
+      // if not, let's just re-run
+      if (!this.canGoNext()) {
+        return this.run();
+      }
+
+      this.tripDirection = 'next';
+
+      // This is te best timing to call tripEnd because no matter
+      // users use arrow key or trip was changed by timer, we will
+      // all be here.
+      var tripObject = this.getCurrentTripObject();
+      var tripEnd = tripObject.onTripEnd || this.settings.onTripEnd;
+      var tripEndDefer = tripEnd(this.tripIndex, tripObject);
+
+      $.when(tripEndDefer).then(function() {
+        if (that.isLast()) {
+          that.doLastOperation();
+        }
+        else {
+          that.increaseIndex();
+          that.run();
+        }
+      });
+    },
+
+    /**
+     * prev API, which will jump to previous trip.
+     *
+     * @memberOf Trip
+     * @type {Function}
+     * @public
+     */
+    prev: function() {
+      var that = this;
+      this.tripDirection = 'prev';
+
+      // When this is executed, it means users click on the arrow key to
+      // navigate back to previous trip. In that scenario, this is the better
+      // place to call onTripEnd before modifying tripIndex.
+      var tripObject = this.getCurrentTripObject();
+      var tripEnd = tripObject.onTripEnd || this.settings.onTripEnd;
+      var tripEndDefer = tripEnd(this.tripIndex, tripObject);
+
+      $.when(tripEndDefer).then(function() {
+        if (!that.isFirst() && that.canGoPrev()) {
+          that.decreaseIndex();
+        }
+        that.run();
+      });
+    },
+
+    /**
+     * Show current trip. In this method, we will control all stuffs about
+     * current trip including animation, timer, expose, progress bar.
+     *
+     * @memberOf Trip
+     * @type {Function}
+     * @param {Object} o
+     */
+    showCurrentTrip: function(o) {
+      if (this.settings.enableAnimation) {
+        this.removeAnimation();
+      }
+
+      // preprocess when we have to show trip block
+      if (this.timer) {
+        this.timer.stop();
+      }
+
+      if (this.hasExpose) {
+        this.hideExpose();
+      }
+
+      if (this.progressing) {
+        this.hideProgressBar();
+
+        // not doing the progress effect
+        this.progressing = false;
+      }
+
+      this.setTripBlock(o);
+      this.showTripBlock(o);
+
+      if (this.settings.enableAnimation) {
+        this.addAnimation(o);
+      }
+
+      if (o.expose) {
+        this.showExpose();
+      }
+    },
+
+    /**
+     * This is the last operation when we successfully finish all trips in
+     * the end.
+     *
+     * @memberOf Trip
+     * @type {Function}
+     */
+    doLastOperation: function() {
+      if (this.timer) {
+        this.timer.stop();
+      }
+
+      if (this.settings.enableKeyBinding) {
+        this.unbindKeyEvents();
+      }
+
+      this.hideTripBlock();
+      this.unbindResizeEvents();
+
+      if (this.hasExpose) {
+        this.hideExpose();
+      }
+
+      if (this.settings.backToTopWhenEnded) {
+        this.$root.animate({ scrollTop: 0 }, 'slow');
+      }
+
+      var tripObject = this.getCurrentTripObject();
+      this.settings.onEnd(this.tripIndex, tripObject);
+
+      // We have to reset tripIndex when trip got finished
+      this.tripIndex = this.settings.tripIndex;
+      return false;
+    },
+
+    /**
+     * This is used to show progress bar UI. We will use jQuery to manipulate
+     * the animation.
+     *
+     * @memberOf Trip
+     * @type {Function}
+     * @param {Number} delay
+     */
+    showProgressBar: function(delay) {
+      var that = this;
+
+      this.$bar.animate({
+        width: '100%'
+      }, delay, 'linear', function() {
+        that.$bar.width(0);
+      });
+    },
+
+    /**
+     * Hide the progress bar and stop animations.
+     *
+     * @memberOf Trip
+     * @type {Function}
+     */
+    hideProgressBar: function() {
+      this.$bar.width(0);
+      this.$bar.stop(true);
+    },
+
+    /**
+     * Pause the progress bar.
+     *
+     * @memberOf Trip
+     * @type {Function}
+     */
+    pauseProgressBar: function() {
+      this.$bar.stop(true);
+    },
+
+    /**
+     * Resumse the progress bar.
+     *
+     * @memberOf Trip
+     * @type {Function}
+     * @param {Number} remainingTime
+     */
+    resumeProgressBar: function(remainingTime) {
+      this.showProgressBar(remainingTime);
+    },
+
+    /**
+     * This is the main function to control each trip. In this method, we will
+     * make sure every tripData is valid and use that to do following works like
+     * showing trip, setup timer and trigger registered callbacks at the right
+     * timing.
+     *
+     * @memberOf Trip
+     * @type {Function}
+     */
+    run: function() {
+      var that = this;
+      var tripObject = this.getCurrentTripObject();
+      var tripStart = tripObject.onTripStart || this.settings.onTripStart;
+      var tripChange = tripObject.onTripChange || this.settings.onTripChange;
+      var delay = tripObject.delay || this.settings.delay;
+
+      if (!this.isTripDataValid(tripObject)) {
+        // force developers to double check tripData again
+        if (this.settings.skipUndefinedTrip === false) {
+          this.console.error(
+            'Your tripData is not valid at index: ' + this.tripIndex);
+          this.stop();
+          return false;
+        }
+        // let it go
+        else {
+          return this[this.tripDirection]();
+        }
+      }
+
+      this.showCurrentTrip(tripObject);
+      this.showProgressBar(delay);
+      this.progressing = true;
+
+      tripChange(this.tripIndex, tripObject);
+      tripStart(this.tripIndex, tripObject);
+
+      // set timer to show next, if the timer is less than zero we expect
+      // it to be manually advanced
+      if (delay >= 0) {
+        this.timer = new Timer(function() {
+          that.next();
+        }, delay);
+      }
+    },
+
+    /**
+     * Check whether current trip is the first one.
+     *
+     * @memberOf Trip
+     * @type {Function}
+     * @return {Boolean} whether current trip is the first one
+     */
+    isFirst: function() {
+      return (this.tripIndex === 0) ? true : false;
+    },
+
+    /**
+     * Check whether current trip is the last one.
+     *
+     * @memberOf Trip
+     * @type {Function}
+     * @return {Boolean} whether current trip is the last one
+     */
+    isLast: function() {
+      return (this.tripIndex === this.tripData.length - 1) ? true : false;
+    },
+
+    /**
+     * Check whether tripData is valid
+     *
+     * @memberOf Trip
+     * @type {Function}
+     * @param {Object} o tripData
+     * @return {Boolean} whether tripData is valid
+     */
+    isTripDataValid: function(o) {
+      if (this.hasSpecialDirections()) {
+        return true;
+      }
+
+      if (o.nextClickSelector && $(o.nextClickSelector).length === 0) {
+        return false;
+      }
+
+      // have to check `sel` & `content` two required fields
+      if (typeof o.content === 'undefined' ||
+        typeof o.sel === 'undefined' ||
+        o.sel === null ||
+        o.sel.length === 0 ||
+        $(o.sel).length === 0) {
+          return false;
+      }
+      return true;
+    },
+
+    /**
+     * Check whether position is special or not
+     *
+     * @memberOf Trip
+     * @type {Function}
+     * @param {String} position position
+     * @return {Boolean} whether position is speical direction or not
+     */
+    hasSpecialDirections: function() {
+      var o = this.getCurrentTripObject();
+      var position = o.position;
+      var specialDirections = [
+        'screen-ne',
+        'screen-se',
+        'screen-sw',
+        'screen-nw',
+        'screen-center'
+      ];
+
+      // if we have set special direction,
+      // we don't need to check sel
+      if ($.inArray(position, specialDirections) >= 0) {
+        return true;
+      }
+      return false;
+    },
+
+    /**
+     * Check whether we can go to previous trip or not.
+     *
+     * @memberOf Trip
+     * @type {Function}
+     * @return {Boolean} whether we can go to previous trip
+     */
+    canGoPrev: function() {
+      var trip = this.tripData[this.tripIndex];
+      var canGoPrev = trip.canGoPrev || this.settings.canGoPrev;
+
+      if (typeof canGoPrev === 'function') {
+        canGoPrev = canGoPrev.call(trip);
+      }
+
+      return canGoPrev;
+    },
+
+    /**
+     * Check whether we can go to next trip or not.
+     *
+     * @memberOf Trip
+     * @type {Function}
+     * @return {Boolean} whether we can go to next trip
+     */
+    canGoNext: function() {
+      var trip = this.tripData[this.tripIndex];
+      var canGoNext = trip.canGoNext || this.settings.canGoNext;
+
+      if (typeof canGoNext === 'function') {
+        canGoNext = canGoNext.call(trip);
+      }
+
+      return canGoNext;
+    },
+
+    /**
+     * We can call this method to increase tripIndex because we are not allowed
+     * to manipualte the value directly.
+     *
+     * @memberOf Trip
+     * @type {Function}
+     */
+    increaseIndex: function() {
+      if (this.tripIndex >= this.tripData.length - 1) {
+        // how about hitting the last item ?
+        // do nothing
+      }
+      else {
+        this.tripIndex += 1;
+      }
+    },
+
+    /**
+     * We can call this method to decrease tripIndex because we are not allowed
+     * to manipualte the value directly.
+     *
+     * @memberOf Trip
+     * @type {Function}
+     */
+    decreaseIndex: function() {
+      if (this.tripIndex <= 0) {
+        // how about hitting the first item ?
+        // do nothing
+      }
+      else {
+        this.tripIndex -= 1;
+      }
+    },
+
+    /**
+     * We will use this native method to know whether this is an array.
+     *
+     * TODO
+     * we have to move this to TripUtils
+     *
+     * @memberOf Trip
+     * @type {Function}
+     * @return {Boolean}
+     */
+    isArray: function(target) {
+      return Object.prototype.toString.call(target) === '[object Array]';
+    },
+
+    /**
+     * We will use this native method to know whether this is an string.
+     *
+     * TODO
+     * we have to move this to TripUtils
+     *
+     * @memberOf Trip
+     * @type {Function}
+     * @return {Boolean}
+     */
+    isString: function(target) {
+      return (typeof target === 'string');
+    },
+
+    /**
+     * We will use this native method to know whether this is an object.
+     *
+     * TODO
+     * we have to move this to TripUtils
+     *
+     * @memberOf Trip
+     * @type {Function}
+     * @return {Boolean}
+     */
+    isObject: function(target) {
+      return Object.prototype.toString.call(target) === '[object Object]';
+    },
+
+    /**
+     * This method is used to get current trip data.
+     *
+     * @memberOf Trip
+     * @type {Function}
+     * @return {Object} current trip data
+     */
+    getCurrentTripObject: function() {
+      return this.tripData[this.tripIndex];
+    },
+
+    /**
+     * This method is used to replace all passed content with `tripIndex` and
+     * `tripTotal` information.
+     *
+     * @memberOf Trip
+     * @type {Function}
+     * @param {String} content
+     * @return {String} replaced content
+     */
+    getReplacedTripContent: function(content) {
+      content = content || '';
+      var reTripIndex = /\{\{(tripIndex)\}\}/g;
+      var reTripTotal = /\{\{(tripTotal)\}\}/g;
+
+      content = content.replace(reTripIndex, this.tripIndex + 1);
+      content = content.replace(reTripTotal, this.tripData.length);
+      return content;
+    },
+
+    /**
+     * Based on current trip data, we will use this method to set all stuffs
+     * we want like content, prev / next labels, close button, used animations.
+     *
+     * @memberOf Trip
+     * @type {Function}
+     * @param {Object} o
+     */
+    setTripBlock: function(o) {
+      var $tripBlock = this.$tripBlock;
+      var that = this;
+
+      // toggle used settings
+      var showCloseBox = o.showCloseBox || this.settings.showCloseBox;
+      var showNavigation = o.showNavigation || this.settings.showNavigation;
+      var showHeader = o.showHeader || this.settings.showHeader;
+
+      // labels
+      var closeBoxLabel = o.closeBoxLabel || this.settings.closeBoxLabel;
+      var prevLabel = o.prevLabel || this.settings.prevLabel;
+      var nextLabel = o.nextLabel || this.settings.nextLabel;
+      var finishLabel = o.finishLabel || this.settings.finishLabel;
+
+      // other user customized contents
+      var header = o.header || this.settings.header;
+
+      $tripBlock
+        .find('.trip-header')
+        .html(this.getReplacedTripContent(header))
+        .toggle(showHeader);
+
+      $tripBlock
+        .find('.trip-content')
+        .html(this.getReplacedTripContent(o.content));
+
+      $tripBlock
+        .find('.trip-prev')
+        .html(prevLabel)
+        .toggle(showNavigation && !this.isFirst());
+
+      $tripBlock
+        .find('.trip-next')
+        .html(this.isLast() ? finishLabel : nextLabel)
+        .toggle(showNavigation && !o.nextClickSelector);
+
+      $tripBlock
+        .find('.trip-close')
+        .html(closeBoxLabel)
+        .toggle(showCloseBox);
+
+      // remove old styles then add new one
+      $tripBlock.removeClass(
+        'e s w n screen-ne screen-se screen-sw screen-nw screen-center');
+      $tripBlock.addClass(o.position);
+
+      // if we have a nextClickSelector use that as the trigger for the next button
+      if (o.nextClickSelector) {
+        $(o.nextClickSelector).one('click.Trip', function(e) {
+          e.preventDefault();
+          // Force IE/FF to lose focus
+          $(this).blur();
+          that.next();
+        });
+      }
+
+      // NOTE: issue #27
+      // we have to set position left first then position top
+      // because when tripBlock hits the page margin, it will become
+      // multi-lined and this will break cached attributes.
+      //
+      // In this way, we have to count these attributes at runtime.
+      this.setTripBlockPosition(o, 'horizontal');
+      this.setTripBlockPosition(o, 'vertical');
+    },
+
+    /**
+     * This method is mainly used to help us position the trip block. As you can
+     * see, we will find out the $sel and its positions first then put our trip
+     * block at the right location.
+     *
+     * @memberOf Trip
+     * @type {Function}
+     * @param {Object} o
+     * @param {String} horizontalOrVertical
+     */
+    setTripBlockPosition: function(o, horizontalOrVertical) {
+      var $tripBlock = this.$tripBlock;
+      var $sel = $(o.sel);
+      var selWidth = $sel && $sel.outerWidth();
+      var selHeight = $sel && $sel.outerHeight();
+      var blockWidth = $tripBlock.outerWidth();
+      var blockHeight = $tripBlock.outerHeight();
+      var arrowHeight = 10;
+      var arrowWidth = 10;
+      var cssHorizontal;
+      var cssVertical;
+
+      switch (o.position) {
+        case 'screen-center':
+          cssHorizontal = '50%';
+          cssVertical = '50%';
+          break;
+        case 'screen-ne':
+        case 'screen-se':
+        case 'screen-nw':
+        case 'screen-sw':
+          cssHorizontal = this.CONSTANTS.TRIP_BLOCK_OFFSET_HORIZONTAL;
+          cssVertical = this.CONSTANTS.TRIP_BLOCK_OFFSET_VERTICAL;
+          break;
+        case 'e':
+          cssHorizontal = $sel.offset().left + selWidth + arrowWidth;
+          cssVertical = $sel.offset().top - ((blockHeight - selHeight) / 2);
+          break;
+        case 's':
+          cssHorizontal = $sel.offset().left + ((selWidth - blockWidth) / 2);
+          cssVertical = $sel.offset().top + selHeight + arrowHeight;
+          break;
+        case 'w':
+          cssHorizontal = $sel.offset().left - (arrowWidth + blockWidth);
+          cssVertical = $sel.offset().top - ((blockHeight - selHeight) / 2);
+          break;
+        case 'n':
+          /* falls through */
+        default:
+          cssHorizontal = $sel.offset().left + ((selWidth - blockWidth) / 2);
+          cssVertical = $sel.offset().top - arrowHeight - blockHeight;
+          break;
+      }
+
+      if (horizontalOrVertical === 'horizontal') {
+        // reset styles first
+        $tripBlock.css({
+          left: '',
+          right: '',
+          marginLeft: '',
+        });
+
+        switch (o.position) {
+          case 'screen-center':
+            $tripBlock.css({
+              left: cssHorizontal,
+              marginLeft: -0.5 * blockWidth
+            });
+            break;
+          case 'screen-se':
+          case 'screen-ne':
+            $tripBlock.css({
+              right: cssHorizontal
+            });
+            break;
+          case 'screen-sw':
+          case 'screen-nw':
+          case 'e':
+          case 's':
+          case 'w':
+          case 'n':
+            /* falls through */
+          default:
+            $tripBlock.css({
+              left: cssHorizontal
+            });
+            break;
+        }
+      }
+      else if (horizontalOrVertical === 'vertical') {
+        // reset styles first
+        $tripBlock.css({
+          top: '',
+          bottom: '',
+          marginTop: '',
+        });
+
+        switch (o.position) {
+          case 'screen-center':
+            $tripBlock.css({
+              top: cssVertical,
+              marginTop: -0.5 * blockHeight
+            });
+            break;
+          case 'screen-sw':
+          case 'screen-se':
+            $tripBlock.css({
+              bottom: cssVertical
+            });
+            break;
+          case 'screen-nw':
+          case 'screen-ne':
+          case 'e':
+          case 's':
+          case 'w':
+          case 'n':
+            /* falls through */
+          default:
+            $tripBlock.css({
+              top: cssVertical
+            });
+            break;
+        }
+      }
+    },
+
+    /**
+     * Add animation on the trip block.
+     *
+     * @memberOf Trip
+     * @type {Function}
+     * @param {Object} o
+     */
+    addAnimation: function(o) {
+      var animation = o.animation || this.settings.animation;
+      if ($.inArray(animation, CHECKED_ANIMATIONS) >= 0) {
+        this.$tripBlock.addClass('animated');
+        this.$tripBlock.addClass(animation);
+      }
+    },
+
+    /**
+     * Remove animation from the trip block.
+     *
+     * @memberOf Trip
+     * @type {Function}
+     */
+    removeAnimation: function() {
+      this.$tripBlock.removeClass(CHECKED_ANIMATIONS.join(' '));
+      this.$tripBlock.removeClass('animated');
+    },
+
+    /**
+     * After we positioned our trip block, we have to show it on the screen. If
+     * the trip block is not on the screen, we will scroll the $root element and
+     * then make sure it is definitely on the screen.
+     *
+     * @memberOf Trip
+     * @type {Function}
+     * @param {Object} o
+     */
+    showTripBlock: function(o) {
+      this.$tripBlock.css({
+        display: 'inline-block',
+        // we have to make it higher than the overlay
+        zIndex: this.settings.overlayZindex + 1
+      });
+
+      var windowHeight = $(window).height();
+      var windowTop = $(window).scrollTop();
+      var tripBlockTop = this.$tripBlock.offset().top;
+      var tripBlockHeight = this.$tripBlock.height();
+      var OFFSET = 100; // make it look nice
+
+      if (tripBlockTop + tripBlockHeight < windowTop + windowHeight &&
+        tripBlockTop >= windowTop) {
+          // tripBlock is located inside the current screen,
+          // so we don't have to scroll
+      }
+      else {
+        this.$root.animate({ scrollTop: tripBlockTop - OFFSET }, 'slow');
+      }
+    },
+
+    /**
+     * Hide the trip block.
+     *
+     * @memberOf Trip
+     * @type {Function}
+     */
+    hideTripBlock: function() {
+      this.$tripBlock.fadeOut('slow');
+    },
+
+    /**
+     * This is a method wrapper.
+     *
+     * @memberOf Trip
+     * @type {Function}
+     */
+    create: function() {
+      this.createTripBlock();
+      this.createOverlay();
+    },
+
+    /**
+     * This method is used to create a trip block at the first time when
+     * start. If the trip block already exists on the DOM tree, we will
+     * not create it again.
+     *
+     * @memberOf Trip
+     * @type {Function}
+     */
+    createTripBlock: function() {
+      // make sure the element doesn't exist in the DOM tree
+      if (typeof $('.trip-block').get(0) === 'undefined') {
+        var that = this;
+        var tripBlockHTML = this.settings.tripBlockHTML.join('');
+        var $tripBlock = $(tripBlockHTML).addClass(this.settings.tripTheme);
+
+        $('body').append($tripBlock);
+
+        $tripBlock.find('.trip-close').on('click', function(e) {
+          e.preventDefault();
+          var tripObject = that.getCurrentTripObject();
+          var tripClose = tripObject.onTripClose || that.settings.onTripClose;
+          tripClose(that.tripIndex, tripObject);
+          that.stop();
+        });
+
+        $tripBlock.find('.trip-prev').on('click', function(e) {
+          e.preventDefault();
+          // Force IE/FF to lose focus
+          $(this).blur();
+          that.prev();
+        });
+
+        $tripBlock.find('.trip-next').on('click', function(e) {
+          e.preventDefault();
+          // Force IE/FF to lose focus
+          $(this).blur();
+          that.next();
+        });
+      }
+    },
+
+    /**
+     * This method is used to create overlay. If the overlay is in the DOM tree,
+     * we will not create it again.
+     *
+     * @memberOf Trip
+     * @type {Function}
+     */
+    createOverlay: function() {
+      // make sure the element doesn't exist in the DOM tree
+      if (typeof $('.trip-overlay').get(0) === 'undefined') {
+        var html = [
+          '<div class="trip-overlay">',
+          '</div>'
+        ].join('');
+
+        var $overlay = $(html);
+        $overlay
+          .height($(window).height())
+          .css({
+            zIndex: this.settings.overlayZindex
+          });
+
+        $(this.settings.overlayHolder).append($overlay);
+      }
+    },
+
+    /**
+     * Clean up all stuffs when we are going to start / restart a trip, so we
+     * can make we won't mess up with old stuffs.
+     *
+     * @memberOf Trip
+     * @type {Function}
+     */
+    cleanup: function() {
+      $('.trip-overlay, .trip-block').remove();
+    },
+
+    /**
+     * Initialize Trip.
+     *
+     * @memberOf Trip
+     * @type {Function}
+     */
+    init: function() {
+      this.preInit();
+
+      if (this.settings.enableKeyBinding) {
+        this.bindKeyEvents();
+      }
+
+      this.bindResizeEvents();
+
+      // set refs
+      this.$tripBlock = $('.trip-block');
+      this.$bar = $('.trip-progress-bar');
+      this.$overlay = $('.trip-overlay');
+    },
+
+    /**
+     * Start Trip.
+     *
+     * @memberOf Trip
+     * @type {Function}
+     */
+    start: function() {
+      // cleanup old DOM first
+      this.cleanup();
+
+      // we will call this before initializing all stuffs
+      this.settings.onStart();
+
+      // create some necessary DOM elements at the first time like jQuery UI
+      this.create();
+
+      // init some necessary stuffs like events, late DOM refs
+      // after creating DOMs
+      this.init();
+
+      // main entry
+      this.run();
+    }
+  };
+
+  // Expose to window
+  exports.Trip = Trip;
+
+  /**
+   * 3rd party libraries / toolkits
+   *
+   * We will keep our 3rd party libraries / toolkits here to make sure we can
+   * track where did we get the code from and its usage.
+   *
+   * See also:
+   * http://stackoverflow.com/questions/3969475/javascript-pause-settimeout
+   */
+  function Timer(callback, delay) {
+    var timerId;
+    var start;
+    var remaining = delay;
+
+    this.pause = function() {
+      window.clearTimeout(timerId);
+      remaining -= new Date() - start;
+    };
+
+    this.resume = function() {
+      start = new Date();
+      timerId = window.setTimeout(callback, remaining);
+      return remaining;
+    };
+
+    this.stop = function() {
+      window.clearTimeout(timerId);
+    };
+
+    this.resume();
+  }
+
+}(window, jQuery));
+
+/**
  * covert canvas to image
  * and save the image file
  */
@@ -620,6 +2077,87 @@ window.throttle = throttle = function(fn, threshhold, scope) {
   };
 };
 
+window.TripGuide = (function() {
+  TripGuide.prototype.elements = [
+    {
+      sel: $('.main__inner'),
+      content: '1. Choose image',
+      position: "n"
+    }, {
+      sel: $('.main__zoom-item:nth-child(2)'),
+      content: '2. Adjust it',
+      position: "s"
+    }, {
+      sel: $('.footer'),
+      content: '3. Choose category',
+      position: "n"
+    }, {
+      sel: $('.footer'),
+      content: '4. Add effect',
+      position: "n"
+    }, {
+      sel: $('.main__canvas'),
+      content: '5. Adjust size',
+      position: "s"
+    }, {
+      sel: $('.main__canvas'),
+      content: '6. Rotate',
+      position: "s"
+    }, {
+      sel: $('.main__canvas'),
+      content: '6.5 Drag it',
+      position: "s"
+    }, {
+      sel: $('.main__zoom-item:nth-child(3)'),
+      content: '7. Or delete',
+      position: "s",
+      delay: 1000
+    }, {
+      sel: $('.header__save'),
+      content: '8. Save it',
+      position: "s",
+      delay: 1000
+    }, {
+      sel: $('.header__logo-text'),
+      content: '9. Or add new one',
+      position: "s",
+      delay: 3000
+    }
+  ];
+
+  TripGuide.prototype.config = {
+    delay: -1,
+    tripTheme: "white",
+    animation: "fadeIn",
+    onEnd: function() {
+      var e;
+      console.log("ended");
+      e = document.createEvent('Event');
+      e.initEvent('trip.ended', true, true);
+      return document.dispatchEvent(e);
+    }
+  };
+
+  function TripGuide() {
+    this.trip = new Trip(this.elements, this.config);
+  }
+
+  TripGuide.prototype.start = function() {
+    return this.trip.start();
+  };
+
+  TripGuide.prototype.next = function() {
+    return this.trip.next();
+  };
+
+  TripGuide.prototype.index = function() {
+    return this.trip.tripIndex;
+  };
+
+  return TripGuide;
+
+})();
+
 (function() {
   var Footer;
 
@@ -696,13 +2234,16 @@ window.throttle = throttle = function(fn, threshhold, scope) {
         this.catEffectsRendered[effectCatName] = effectsWrapper;
       }
       this.catItems.classList.remove("active");
-      return this.catEffectsRendered[effectCatName].classList.add("active");
+      this.catEffectsRendered[effectCatName].classList.add("active");
+      return CanvasEditor.nextStep(3);
     };
 
     Footer.prototype.itemEffectClick = function(effect) {
-      var effectImage;
-      effectImage = effect.querySelector(".footer__effect-img").dataset.image;
-      return CanvasEditor.addEffect(effectImage);
+      var effectData, effectImage;
+      effectData = effect.querySelector(".footer__effect-img").dataset;
+      effectImage = CanvasEditor.blendingSupport ? effectData.image : effectData.fallbackImage;
+      CanvasEditor.addEffect(effectImage);
+      return CanvasEditor.nextStep(4);
     };
 
     Footer.prototype.itemBackClick = function() {
@@ -714,8 +2255,6 @@ window.throttle = throttle = function(fn, threshhold, scope) {
       }
       return this.catItems.classList.add("active");
     };
-
-    Footer.prototype.itemRemoveClick = function() {};
 
     Footer.prototype.hasClass = function(el, className) {
       return el.classList && el.classList.contains(className);
@@ -812,6 +2351,10 @@ window.throttle = throttle = function(fn, threshhold, scope) {
       this.cacheDom();
       this.bindEvents();
       this.configFabricCtrl();
+      this.blendingSupport = this.blendingSupport();
+      if (!sessionStorage.getItem("toureShown")) {
+        this.startTrip();
+      }
     }
 
     CanvasEditor.prototype.cacheDom = function() {
@@ -835,14 +2378,35 @@ window.throttle = throttle = function(fn, threshhold, scope) {
       this.cont.classList.add("moving");
       this.canvas.on("object:selected", (function(_this) {
         return function() {
-          _this.draggie.disable();
+          _this.draggie.destroy();
           return _this.cont.classList.remove("moving");
         };
       })(this));
-      return this.canvas.on("selection:cleared", (function(_this) {
+      this.canvas.on("selection:cleared", (function(_this) {
         return function() {
-          _this.draggie.enable();
+          _this.draggie = new Draggabilly(".canvas-container", {});
           return _this.cont.classList.add("moving");
+        };
+      })(this));
+      this.canvas.on("object:scaling", (function(_this) {
+        return function() {
+          if (_this.trip) {
+            return _this.nextStep(5);
+          }
+        };
+      })(this));
+      this.canvas.on("object:rotating", (function(_this) {
+        return function() {
+          if (_this.trip) {
+            return _this.nextStep(6);
+          }
+        };
+      })(this));
+      return this.canvas.on("object:moving", (function(_this) {
+        return function() {
+          if (_this.trip) {
+            return _this.nextStep(7);
+          }
         };
       })(this));
     };
@@ -863,7 +2427,7 @@ window.throttle = throttle = function(fn, threshhold, scope) {
           return item.addEventListener("click", _this.zoomItemClickHandler.bind(_this));
         };
       })(this));
-      return document.addEventListener("keydown", function(e) {
+      document.addEventListener("keydown", function(e) {
         if (e == null) {
           e = e || window.event;
         }
@@ -871,6 +2435,11 @@ window.throttle = throttle = function(fn, threshhold, scope) {
           return this.removeActive();
         }
       });
+      return document.addEventListener("trip.ended", (function(_this) {
+        return function(e) {
+          return _this.trip = null;
+        };
+      })(this), false);
     };
 
     CanvasEditor.prototype.setSizes = function() {
@@ -935,7 +2504,8 @@ window.throttle = throttle = function(fn, threshhold, scope) {
       this.initFabric();
       this.setSizes();
       this.canvas.add(this.originalImg);
-      return this.addWatermark();
+      this.addWatermark();
+      return this.nextStep(1);
     };
 
     CanvasEditor.prototype.saveImage = function() {
@@ -976,12 +2546,21 @@ window.throttle = throttle = function(fn, threshhold, scope) {
       return fabric.Image.fromURL(image, (function(_this) {
         return function(oImg) {
           _this.setCenter(oImg);
-          oImg.set("globalCompositeOperation", "screen");
+          if (_this.blendingSupport) {
+            oImg.set("globalCompositeOperation", "screen");
+          }
           _this.canvas.add(oImg);
           _this.canvas.setActiveObject(oImg);
           return oImg.applyFilters(_this.canvas.renderAll.bind(_this.canvas));
         };
       })(this));
+    };
+
+    CanvasEditor.prototype.blendingSupport = function() {
+      var ctx;
+      ctx = document.createElement('canvas').getContext('2d');
+      ctx.globalCompositeOperation = 'screen';
+      return ctx.globalCompositeOperation === 'screen';
     };
 
     CanvasEditor.prototype.setCenter = function(el) {
@@ -1044,6 +2623,7 @@ window.throttle = throttle = function(fn, threshhold, scope) {
         e = window.event;
       }
       scale = .1;
+      this.nextStep(2);
       if (e.target.classList.contains("main__zoom-item_plus")) {
         this.zoomIt(1 + scale);
       }
@@ -1151,6 +2731,17 @@ window.throttle = throttle = function(fn, threshhold, scope) {
         i++;
       }
       return this.canvas.renderAll();
+    };
+
+    CanvasEditor.prototype.startTrip = function() {
+      this.trip = new TripGuide();
+      return this.trip.start();
+    };
+
+    CanvasEditor.prototype.nextStep = function(i) {
+      if (this.trip && this.trip.index() === i - 1) {
+        return this.trip.next();
+      }
     };
 
     return CanvasEditor;
