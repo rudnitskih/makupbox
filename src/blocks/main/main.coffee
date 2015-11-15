@@ -7,6 +7,8 @@ class CanvasEditor
 		@cacheDom()
 		@bindEvents()
 		@configFabricCtrl()
+		@blendingSupport = @blendingSupport()
+		@startTrip() unless sessionStorage.getItem("toureShown")
 
 	cacheDom: ->
 		@main = document.querySelector(".main")
@@ -16,6 +18,7 @@ class CanvasEditor
 		@ogTags = document.querySelectorAll("meta[name='twitter:image'], meta[itemprop='image'], meta[property='og:image']")
 		@zoomItem = document.querySelectorAll(".main__zoom-item")
 
+
 	initFabric: ->
 		@mainWrapper.classList.add 'active'
 		@canvas = new fabric.Canvas @id
@@ -23,32 +26,29 @@ class CanvasEditor
 		@canvas.setWidth(@oImgSizes.width)
 		@f = fabric.Image.filters
 		@upperCanvas = @mainWrapper.querySelector ".upper-canvas"
-		# console.log 
-		# @canvas.set 
-		# @updFabricCtrl()
-		# interact('.draggable').draggable(
-		# 	manualStart: true
-		# )
 		@cont = @mainWrapper.querySelector ".canvas-container"
 
 		@draggie = new Draggabilly( ".canvas-container", {} )
-		# @configFabricCtrl()
-		# @canvas.on "mouse:down", @mouseDown.bind(@)
-		# @canvas.on "mouse:up", @mouseUp.bind(@)
 		@cont.classList.add "moving"
 
 		
 		@canvas.on "object:selected", =>
-			@draggie.disable()
+			@draggie.destroy()
 			@cont.classList.remove "moving"
-		# 	footer.setActiveRemoveBtn()
+
 		@canvas.on "selection:cleared", =>
-			@draggie.enable()
+			@draggie = new Draggabilly( ".canvas-container", {} )
 			@cont.classList.add "moving"
 
-			# footer.removeActiveRemoveBtn()
-			
-		# @canvas.on "after:render", debounce @setOGTags.bind(@), 2000
+		@canvas.on "object:scaling", =>
+			@nextStep(5) if @trip
+
+		@canvas.on "object:rotating", =>
+			@nextStep(6) if @trip
+
+		@canvas.on "object:moving", =>
+			@nextStep(7) if @trip
+
 
 	bindEvents: ->
 		@inputImage.addEventListener "change", @fileAdded.bind(@)
@@ -61,6 +61,12 @@ class CanvasEditor
 		document.addEventListener "keydown", (e) ->
 			e ?= e || window.event
 			@removeActive() if e.keyCode is 46
+
+		document.addEventListener "trip.ended", (e) =>
+			# sessionStorage.setItem("toureShown", true)
+			@trip = null
+		, false
+			
 		
 	setSizes: ->
 		return unless @canvas
@@ -110,6 +116,7 @@ class CanvasEditor
 		@setSizes()
 		@canvas.add @originalImg
 		@addWatermark()
+		@nextStep(1)
 
 	saveImage: ->
 		return unless @canvas
@@ -134,13 +141,16 @@ class CanvasEditor
 		return unless @canvas
 		fabric.Image.fromURL image, (oImg) =>
 			@setCenter oImg
-			oImg.set "globalCompositeOperation", "screen"
-			# configFabricCtrl
-			# oImg.filters[4] = new @f.Blend({image: @originalImg, mode: 'screen'}) 
+			if @blendingSupport
+				oImg.set "globalCompositeOperation", "screen"
 			@canvas.add oImg
 			@canvas.setActiveObject oImg
 			oImg.applyFilters(@canvas.renderAll.bind(@canvas))
-		# @selectAll()
+	
+	blendingSupport: ->
+		ctx = document.createElement('canvas').getContext('2d')
+		ctx.globalCompositeOperation = 'screen'
+		ctx.globalCompositeOperation is 'screen'
 
 	setCenter: (el) ->
 		cWidth = @canvas.width
@@ -182,6 +192,7 @@ class CanvasEditor
 	zoomItemClickHandler: (e) ->
 		e ?= window.event
 		scale = .1
+		@nextStep(2)
 		if e.target.classList.contains "main__zoom-item_plus"
 			@zoomIt(1 + scale)
 		if e.target.classList.contains "main__zoom-item_minus"
@@ -193,7 +204,6 @@ class CanvasEditor
 		@canvas.setHeight @canvas.getHeight() * factor
 		@canvas.setWidth @canvas.getWidth() * factor
 		if @canvas.backgroundImage
-			# Need to scale background images as well
 			bi = @canvas.backgroundImage
 			bi.width = bi.width * factor
 			bi.height = bi.height * factor
@@ -229,15 +239,6 @@ class CanvasEditor
 		fabric.Object::transparentCorners = false
 		fabric.Object::borderColor = "#161616"
 		fabric.Object::cornerColor = "#161616"
-		
-
-		# _original = fabric.Object::_drawControl
-		# fabric.Object::_drawControl = (control, ctx, methodName, left, top) ->
-			# size = @cornerSize = 15
-			# if @canvas.hasControlCallback and @canvas.hasControlCallback[control]
-				# @canvas.controlCallback[control] ctx, left, top, size
-			# else
-				# _original.call this, control, ctx, methodName, left, top
 
 	updFabricCtrl: ->
 		@canvas.hasControlCallback =
@@ -252,7 +253,9 @@ class CanvasEditor
 
 	removeActive: ->
 		obj = @canvas.getActiveObject()
-		obj.remove() if obj
+		if obj
+			obj.remove()
+
 
 	selectAll: ->
 		objs = @canvas.getObjects().map((o) ->
@@ -276,6 +279,14 @@ class CanvasEditor
 			@canvas.add items[i]
 			i++
 		@canvas.renderAll()
+
+	startTrip: ->
+		@trip = new TripGuide()
+		@trip.start()
+
+	nextStep: (i) ->
+		@trip.next() if @trip and @trip.index() is i - 1
+			
 
 document.addEventListener "DOMContentLoaded", ->
 	setTimeout =>

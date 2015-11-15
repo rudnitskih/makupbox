@@ -49,19 +49,19 @@ class Footer
 
 		@catItems.classList.remove "active"
 		@catEffectsRendered[ effectCatName ].classList.add "active"
+		CanvasEditor.nextStep(3)
 
 	itemEffectClick: (effect) ->
-		effectImage = effect.querySelector(".footer__effect-img").dataset.image
+		effectData = effect.querySelector(".footer__effect-img").dataset
+		effectImage = if CanvasEditor.blendingSupport then effectData.image else effectData.fallbackImage
 		CanvasEditor.addEffect effectImage
+		CanvasEditor.nextStep(4)
 
 	itemBackClick: ->
 		for key, item of @catEffectsRendered
 			item.classList.remove "active"
 		@catItems.classList.add "active"
 	
-	itemRemoveClick: ->
-
-
 	hasClass: (el, className) ->
 		el.classList && el.classList.contains className
 
