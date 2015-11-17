@@ -8,7 +8,7 @@ class CanvasEditor
 		@bindEvents()
 		@configFabricCtrl()
 		@blendingSupport = @blendingSupport()
-		@startTrip() unless sessionStorage.getItem("toureShown")
+		@startTrip() unless localStorage.getItem("toureShown")
 		@initSlider()
 
 	cacheDom: ->
@@ -80,7 +80,7 @@ class CanvasEditor
 			@removeActive() if e.keyCode is 46
 
 		document.addEventListener "trip.ended", (e) =>
-			# sessionStorage.setItem("toureShown", true)
+			localStorage.setItem("toureShown", true)
 			@trip = null
 		, false
 			
