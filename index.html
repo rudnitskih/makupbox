@@ -41,21 +41,70 @@
       </div>
       <div data-watermark="assets/i/add-photo.png" class="main__canvas">
         <canvas id="photo-editor"></canvas>
-        <div class="main__likes">
-          <div class="likely likely-light">
-            <div class="twitter"></div>
-            <div class="facebook"></div>
-            <div class="gplus"></div>
-            <div class="pinterest"></div>
-          </div>
-        </div>
-        <div class="main__zoom">
-          <div class="main__zoom-item main__zoom-item_plus draggable">+</div>
-          <div class="main__zoom-item main__zoom-item_minus">-</div>
-          <div class="main__zoom-item main__zoom-item_remove"></div>
-        </div>
-        <script></script>
+        <div class="main__slider"></div>
       </div>
+      <div class="main__likes">
+        <div class="likely likely-light">
+          <div class="twitter"></div>
+          <div class="facebook"></div>
+          <div class="gplus"></div>
+          <div class="pinterest"></div>
+        </div>
+      </div>
+      <div class="main__zoom">
+        <div class="main__zoom-item main__zoom-item_plus draggable">+</div>
+        <div class="main__zoom-item main__zoom-item_minus">-</div>
+        <div class="main__zoom-item main__zoom-item_remove"></div>
+      </div>
+      <script>
+        window.tripElements = [
+            {
+              sel: '.main__inner',
+              content: '1. Choose image',
+              position: "n"
+            }, {
+              sel: '.main__zoom-item:nth-child(2)',
+              content: '2. Adjust it',
+              position: "s"
+            }, {
+              sel: '.footer',
+              content: '3. Choose category',
+              position: "n"
+            }, {
+              sel: '.footer',
+              content: '4. Add effect',
+              position: "n"
+            }, {
+              sel: ".main__tour-helper",
+              content: '5. Adjust size',
+              position: "s"
+            }, {
+              sel: ".main__tour-helper",
+              content: '6. Rotate',
+              position: "n"
+            }, {
+              sel: ".main__tour-helper",
+              content: '6.5 Drag it',
+              position: "s"
+            }, {
+              sel: '.main__zoom-item:nth-child(3)',
+              content: '7. Or delete',
+              position: "s",
+              delay: 6000
+            }, {
+              sel: '.header__save',
+              content: '8. Save it',
+              position: "s",
+              delay: 6000
+            }, {
+              sel: '.header__logo-text',
+              content: '9. Or add new one',
+              position: "s",
+              delay: 6000
+            }
+          ]
+        	
+      </script>
     </main>
     <footer class="footer">
       <ul class="footer__list active">
