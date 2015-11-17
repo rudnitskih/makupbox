@@ -22,13 +22,33 @@
 			display none
 		.canvas-container
 			absolute top 50% left 50%
+			&.moving
+				& + .main__slider
+					visibility hidden
+	&__slider
+		fixed top 50% right 5%
+		height 120px
+		margin-top (-@height / 2)
+		width 10px
+		.noUi-handle
+			width 20px
+			height 26px 
+			&:before
+			&:after
+				display none
+		// background-color red
+	&__tour-helper
+		position absolute
+		width 1px
+		height 1px
+		visibility hidden
 	&.image-added
 		.main
 			&__inner
 			&__input
 				display none
 			&__zoom
-				absolute top left 50%
+				fixed top 40px left 50%
 				margin-left -45px
 				user-select none
 				&-item

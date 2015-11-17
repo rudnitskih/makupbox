@@ -21,17 +21,17 @@ class window.TripGuide
 			position : "n"
 		},
 		{
-			sel : $('.main__canvas'),
+			sel : ".main__tour-helper"
 			content : '5. Adjust size'
 			position : "s"
 		},
 		{
-			sel : $('.main__canvas'),
+			sel : ".main__tour-helper"
 			content : '6. Rotate'
-			position : "s"
+			position : "n"
 		},
 		{
-			sel : $('.main__canvas')
+			sel : ".main__tour-helper"
 			content : '6.5 Drag it'
 			position : "s"
 		},
@@ -39,19 +39,19 @@ class window.TripGuide
 			sel : $('.main__zoom-item:nth-child(3)'),
 			content : '7. Or delete'
 			position : "s"
-			delay: 1000
+			delay: 6000
 		}
 		{
 			sel : $('.header__save'),
 			content : '8. Save it'
 			position : "s"
-			delay: 1000
+			delay: 6000
 		},
 		{
 			sel : $('.header__logo-text'),
 			content : '9. Or add new one'
 			position : "s"
-			delay: 3000
+			delay: 6000
 		},
 
 	]
@@ -60,7 +60,6 @@ class window.TripGuide
 		tripTheme: "white"
 		animation: "fadeIn"
 		onEnd: ->
-			console.log "ended"
 			e = document.createEvent('Event')
 			e.initEvent('trip.ended', true, true)
 			document.dispatchEvent e
@@ -76,3 +75,7 @@ class window.TripGuide
 
 	index: ->
 		@trip.tripIndex
+
+	pause: ->
+		console.log @trip.stop
+		@trip.stop()

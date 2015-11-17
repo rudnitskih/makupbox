@@ -1,2 +1,15 @@
-.trip-content
-	font-family: mainFontBold
+tooltipBG = #3C7BE2
+.trip
+	&-content
+		font-family: Arial, Helvetica Neue, Helvetica, sans-serif
+	&-block.white
+		background-color tooltipBG
+		color #fff
+		&.s
+			&:before
+				border-bottom-color tooltipBG
+		&.n
+			&:before
+				border-top-color tooltipBG
+	&-progress-bar
+		background-color #fff

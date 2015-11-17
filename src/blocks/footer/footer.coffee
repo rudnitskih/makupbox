@@ -54,7 +54,6 @@ class Footer
 		effectData = effect.querySelector(".footer__effect-img").dataset
 		effectImage = if CanvasEditor.blendingSupport then effectData.image else effectData.fallbackImage
 		CanvasEditor.addEffect effectImage
-		CanvasEditor.nextStep(4)
 
 	itemBackClick: ->
 		for key, item of @catEffectsRendered

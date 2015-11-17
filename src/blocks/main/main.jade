@@ -5,12 +5,14 @@ input.main__input( type="file" accept="image/x-png, image/gif, image/jpeg")
 	.main__ask-text <strong>Click here</strong> to upload your picture
 .main__canvas( data-watermark="assets/i/add-photo.png" )
 	canvas#photo-editor
-	.main__likes
-		include ../likely/likely
-	.main__zoom
-		.main__zoom-item.main__zoom-item_plus.draggable +
-		.main__zoom-item.main__zoom-item_minus -
-		.main__zoom-item.main__zoom-item_remove
-	script.
+	.main__slider
+	//- .main__tour-helper
+.main__likes
+	include ../likely/likely
+.main__zoom
+	.main__zoom-item.main__zoom-item_plus.draggable +
+	.main__zoom-item.main__zoom-item_minus -
+	.main__zoom-item.main__zoom-item_remove
+
 		
 

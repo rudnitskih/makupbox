@@ -9,14 +9,17 @@ class CanvasEditor
 		@configFabricCtrl()
 		@blendingSupport = @blendingSupport()
 		@startTrip() unless sessionStorage.getItem("toureShown")
+		@initSlider()
 
 	cacheDom: ->
-		@main = document.querySelector(".main")
-		@mainWrapper = document.querySelector(".main__canvas")
+		@main = document.querySelector ".main"
+		@mainWrapper = document.querySelector ".main__canvas"
+		@slider = document.querySelector ".main__slider"
+		# @tourHelper = @main.querySelector ".main__tour-helper"
 		@watermarkImg = @mainWrapper.dataset.watermark
-		@inputImage = document.querySelector(".main__input")
-		@ogTags = document.querySelectorAll("meta[name='twitter:image'], meta[itemprop='image'], meta[property='og:image']")
-		@zoomItem = document.querySelectorAll(".main__zoom-item")
+		@inputImage = document.querySelector ".main__input"
+		# @ogTags = document.querySelectorAll "meta[name='twitter:image'], meta[itemprop='image'], meta[property='og:image']"
+		@zoomItem = document.querySelectorAll ".main__zoom-item"
 
 
 	initFabric: ->
@@ -27,28 +30,42 @@ class CanvasEditor
 		@f = fabric.Image.filters
 		@upperCanvas = @mainWrapper.querySelector ".upper-canvas"
 		@cont = @mainWrapper.querySelector ".canvas-container"
+		@tourHelper = document.createElement("div")
+		@tourHelper.className = "main__tour-helper"
+		@cont.appendChild @tourHelper
 
-		@draggie = new Draggabilly( ".canvas-container", {} )
+		@draggie = new Draggabilly( ".canvas-container", {} ) unless isIE
 		@cont.classList.add "moving"
 
 		
 		@canvas.on "object:selected", =>
-			@draggie.destroy()
+			# @draggie.destroy()
+			@draggie.disable() unless isIE
 			@cont.classList.remove "moving"
 
 		@canvas.on "selection:cleared", =>
-			@draggie = new Draggabilly( ".canvas-container", {} )
+			# @draggie = new Draggabilly( ".canvas-container", {} )
+			@draggie.enable() unless isIE
 			@cont.classList.add "moving"
 
-		@canvas.on "object:scaling", =>
-			@nextStep(5) if @trip
+		if @trip
+			@canvas.on "object:scaling", @objectScalingCB.bind(@)	
+				
+				# debounce , 200
+			@canvas.on "object:rotating", =>
+				@nextStep(6, @getMoveCoor()) if @trip
 
-		@canvas.on "object:rotating", =>
-			@nextStep(6) if @trip
+			@canvas.on "object:moving", =>
+				@nextStep(7) if @trip
 
-		@canvas.on "object:moving", =>
-			@nextStep(7) if @trip
-
+	objectScalingCB: ->
+		return unless @trip
+		trip = document.querySelector ".trip-block"
+		trip.classList.remove "fadeIn"
+		trip.classList.remove "animated"
+		trip.style.opacity = 0
+		@canvas.on "mouse:up", =>
+			@nextStep(5, @getRotateCoor())
 
 	bindEvents: ->
 		@inputImage.addEventListener "change", @fileAdded.bind(@)
@@ -58,7 +75,7 @@ class CanvasEditor
 		@imgObj.addEventListener "load", @imageLoaded.bind(@)
 		[].forEach.call @zoomItem, (item) =>
 			item.addEventListener "click", @zoomItemClickHandler.bind(@)
-		document.addEventListener "keydown", (e) ->
+		document.addEventListener "keydown", (e) =>
 			e ?= e || window.event
 			@removeActive() if e.keyCode is 46
 
@@ -146,6 +163,7 @@ class CanvasEditor
 			@canvas.add oImg
 			@canvas.setActiveObject oImg
 			oImg.applyFilters(@canvas.renderAll.bind(@canvas))
+			@nextStep(4, @getScaleCoor())
 	
 	blendingSupport: ->
 		ctx = document.createElement('canvas').getContext('2d')
@@ -284,9 +302,55 @@ class CanvasEditor
 		@trip = new TripGuide()
 		@trip.start()
 
-	nextStep: (i) ->
+	nextStep: (i, coor) ->
+		if coor
+			@tourHelper.style.top = "#{coor.y}px"
+			@tourHelper.style.left = "#{coor.x}px"
 		@trip.next() if @trip and @trip.index() is i - 1
-			
+	
+	initSlider: ->
+		noUiSlider.create @slider,
+			start: 100
+			connect: "lower"
+			direction: 'rtl'
+			animate: true
+			orientation: "vertical"
+			range: 
+				'min': 0
+				'max': 100
+
+		@slider.noUiSlider.on 'change', @setEffectOpacity.bind(@)
+	
+	setSliderValue: (val = 100) ->
+		@slider.noUiSlider.set val
+
+	setEffectOpacity: (arr, lower, high) ->
+		obj = @canvas.getActiveObject()
+		if obj
+			obj.setOpacity high / 100
+			@canvas.renderAll()
+
+	getScaleCoor: ->
+		obj = @canvas.getActiveObject()
+		if obj
+			return {
+				x: obj.oCoords.br.x
+				y: obj.oCoords.br.y + 10
+			}
+
+	getRotateCoor: ->
+		obj = @canvas.getActiveObject()
+		if obj
+			return {
+				x: obj.oCoords.mtr.x
+				y: obj.oCoords.mtr.y - 10
+			}
+
+	getMoveCoor: ->
+		{
+			x: @canvas.width * .9
+			x: @canvas.height * .2
+		}
 
 document.addEventListener "DOMContentLoaded", ->
 	setTimeout =>
