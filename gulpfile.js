@@ -55,7 +55,7 @@ gulp.task('scripts',function(){
       .on('error', console.log),
     gulp.src('./src/blocks/**/*.js')
   ).pipe(concat("project.js"))
-  .pipe(uglify())
+  // .pipe(uglify())
   // .pipe(obfuscate({ replaceMethod: obfuscate.ZALGO }))
   .pipe(gulp.dest('./out/assets/'))
   .pipe(livereload());
@@ -88,7 +88,7 @@ gulp.task('styles', function() {
       .on('error', console.log),
     gulp.src('./src/blocks/**/*.css')
   ).pipe(concat("project.css"))
-  .pipe(cssmin())
+  // .pipe(cssmin())
   .pipe(gulp.dest('./out/assets/'))
   .pipe(livereload());
 });
@@ -122,8 +122,18 @@ gulp.task('server', function() {
       gulp.start('server');
   });
   gulp.task('default',['watch', 'jade', 'imagemin', "scripts", "styles", "fonts" ]);
-    
-gulp.task('deploy', function () {
+
+gulp.task('min-files', function() {
+  gulp.src("./out/assets/*.js")
+    .pipe(uglify())
+    .pipe(gulp.dest('./out/assets/'))
+  gulp.src("./out/assets/*.css")
+    .pipe(cssmin())
+    .pipe(gulp.dest('./out/assets/'))    
+
+});
+
+gulp.task('deploy', ['min-files'], function () {
   return gulp.src("./out/**/*")
     .pipe(deploy())
 });

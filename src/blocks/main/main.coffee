@@ -38,10 +38,11 @@ class CanvasEditor
 		@cont.classList.add "moving"
 
 		
-		@canvas.on "object:selected", =>
+		@canvas.on "object:selected", (obj) =>
 			# @draggie.destroy()
 			@draggie.disable() unless isIE
 			@cont.classList.remove "moving"
+			@setSliderValue obj.target.get("opacity") * 100
 
 		@canvas.on "selection:cleared", =>
 			# @draggie = new Draggabilly( ".canvas-container", {} )
@@ -50,11 +51,8 @@ class CanvasEditor
 
 		if @trip
 			@canvas.on "object:scaling", @objectScalingCB.bind(@)	
-				
-				# debounce , 200
 			@canvas.on "object:rotating", =>
 				@nextStep(6, @getMoveCoor()) if @trip
-
 			@canvas.on "object:moving", =>
 				@nextStep(7) if @trip
 
@@ -351,6 +349,7 @@ class CanvasEditor
 			x: @canvas.width * .9
 			x: @canvas.height * .2
 		}
+
 
 document.addEventListener "DOMContentLoaded", ->
 	setTimeout =>
