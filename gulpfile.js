@@ -18,6 +18,9 @@ var gulp = require('gulp'),
     vinylYamlData = require('vinyl-yaml-data'),
     deepExtend = require('deep-extend-stream'),
     nib = require('nib'),
+    obfuscate = require('gulp-obfuscate'),
+    uglify = require('gulp-uglify'),
+    cssmin = require('gulp-cssmin'),
     locals = {};
 
 gulp.task('yaml',function(){
@@ -52,6 +55,8 @@ gulp.task('scripts',function(){
       .on('error', console.log),
     gulp.src('./src/blocks/**/*.js')
   ).pipe(concat("project.js"))
+  .pipe(uglify())
+  // .pipe(obfuscate({ replaceMethod: obfuscate.ZALGO }))
   .pipe(gulp.dest('./out/assets/'))
   .pipe(livereload());
 });
@@ -83,6 +88,7 @@ gulp.task('styles', function() {
       .on('error', console.log),
     gulp.src('./src/blocks/**/*.css')
   ).pipe(concat("project.css"))
+  .pipe(cssmin())
   .pipe(gulp.dest('./out/assets/'))
   .pipe(livereload());
 });
