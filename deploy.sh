@@ -4,7 +4,8 @@ cp -r ./out ./out_min
 gulp deploy
 rm -r -f ./.publish
 git add .
-git commit -m "$1"
+testMSG=${1:="auto-commit"}
+git commit -m "testMSG"
 git push bitbucket
 rm -r ./out
 rm -r ./out_min
