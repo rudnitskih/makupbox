@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, minimum-scale=1, maximum-scale=1" name="viewport">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="author" content="Rudnytskykh Dmytro, website: rudnitskih.pp.ua">
+    <title>MakupBOX</title>
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+    <meta itemprop="name" content="MakupBOX">
+    <meta itemprop="description" content="">
+    <meta itemprop="image">
+    <meta name="twitter:card" content="product">
+    <meta name="twitter:site" content="undefined">
+    <meta name="twitter:title" content="MakupBOX">
+    <meta name="twitter:description" content="">
+    <meta name="twitter:image">
+    <meta property="og:title" content="MakupBOX">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="makupbox.com">
+    <meta property="og:image">
+    <meta property="og:description" content="">
+    <meta property="og:site_name" content="MakupBOX">
+    <title>
+    </title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto:400,700" rel="stylesheet" type="text/css">
+    <link href="assets/project.css" rel="stylesheet">
+  </head>
+  <body>
+    <header class="header">
+      <div class="container">
+        <div class="header__filters"><span data-filter="return new f.Noise({noise: 40});" class="header__filters-item">lq</span><span data-filter="return new f.BrightnessContrast({contrast:0.5,brightness:100}) //contrast from -1 to 1; brightness from 0 to 100" class="header__filters-item">filter</span><span data-filter="return new f.Convolute({matrix: [ 2/9, 1/9, 1/9, 2/9, 1/9, 1/9, 2/9, 1/9, 1/9 ]});" class="header__filters-item">blur</span>
+        </div><a href="/" title="MakeupBOX" class="header__logo"><span class="header__logo-text desktop">MakeUP<strong>Box</strong></span><strong class="header__logo-text mobile">MBOX</strong></a><a class="header__save"><img src="assets/i/download.png" height="19" width="15" alt="save" class="header__save-icon"><span class="header__save-title">save</span></a>
+      </div>
+    </header>
+    <main class="main">
+      <input type="file" accept="image/x-png, image/gif, image/jpeg" class="main__input">
+      <div class="main__inner"><img src="assets/i/add-photo.png" width="69px" height="69px" class="main__add-photo">
+        <div class="main__ask-text"><strong>Click here</strong> to upload your picture</div>
+      </div>
+      <div data-watermark="assets/i/add-photo.png" class="main__canvas">
+        <canvas id="photo-editor"></canvas>
+        <div class="main__slider"></div>
+      </div>
+      <div class="main__likes">
+        <div class="likely likely-light">
+          <div class="twitter"></div>
+          <div class="facebook"></div>
+          <div class="gplus"></div>
+          <div class="pinterest"></div>
+        </div>
+      </div>
+      <div class="main__zoom">
+        <div class="main__zoom-item main__zoom-item_plus draggable">+</div>
+        <div class="main__zoom-item main__zoom-item_minus">-</div>
+        <div class="main__zoom-item main__zoom-item_remove"></div>
+      </div>
+      <script>
+        window.tripElements = [
+            {
+              sel: '.main__inner',
+              content: '1. Choose image',
+              position: "n"
+            }, {
+              sel: '.main__zoom-item:nth-child(2)',
+              content: '2. Adjust it',
+              position: "s"
+            }, {
+              sel: '.footer',
+              content: '3. Choose category',
+              position: "n"
+            }, {
+              sel: '.footer',
+              content: '4. Add effect',
+              position: "n"
+            }, {
+              sel: ".main__tour-helper",
+              content: '5. Adjust size',
+              position: "s"
+            }, {
+              sel: ".main__tour-helper",
+              content: '6. Rotate',
+              position: "n"
+            }, {
+              sel: ".main__tour-helper",
+              content: '6.5 Drag it',
+              position: "s"
+            }, {
+              sel: '.main__zoom-item:nth-child(3)',
+              content: '7. Or delete',
+              position: "s",
+              delay: 3000
+            }, {
+              sel: '.header__save',
+              content: '8. Save it',
+              position: "w",
+              delay: 3000
+            }, {
+              sel: '.header__logo-text',
+              content: '9. Or add new one',
+              position: "s",
+              delay: 3000
+            }
+          ]
+        	
+      </script>
+    </main>
+    <footer class="footer">
+      <ul class="footer__list active">
+        <li class="footer__item footer__item_cat">
+          <div class="footer__icon-container"><img src="assets/i/hair.png" class="footer__icon"></div><span class="footer__name">hair</span>
+          <script type="template" name="cat-items-0">
+            <li class="footer__item footer__item_effect"><img src="assets/i/makeup_thumb.png" data-image="assets/i/makeup_thumb.png" data-fallback-image="assets/i/makeup_thumb.png?v=2" class="footer__effect-img">
+            </li>
+            <li class="footer__item footer__item_effect"><img src="assets/i/makeup_thumb.png" data-image="assets/i/makeup_thumb.png" data-fallback-image="assets/i/makeup_thumb.png?v=2" class="footer__effect-img">
+            </li>
+            <li class="footer__item footer__item_effect"><img src="assets/i/makeup_thumb.png" data-image="assets/i/makeup_thumb.png" data-fallback-image="assets/i/makeup_thumb.png?v=2" class="footer__effect-img">
+            </li>
+            <li class="footer__item footer__item_effect"><img src="assets/i/makeup_thumb.png" data-image="assets/i/makeup_thumb.png" data-fallback-image="assets/i/makeup_thumb.png?v=2" class="footer__effect-img">
+            </li>
+          </script>
+        </li>
+        <li class="footer__item footer__item_cat">
+          <div class="footer__icon-container"><img src="assets/i/forehead.png" class="footer__icon"></div><span class="footer__name">forehead</span>
+          <script type="template" name="cat-items-1">
+            <li class="footer__item footer__item_effect"><img src="assets/i/makeup_thumb.png" data-image="assets/i/makeup_thumb.png" data-fallback-image="assets/i/makeup_thumb.png?v=2" class="footer__effect-img">
+            </li>
+            <li class="footer__item footer__item_effect"><img src="assets/i/makeup_thumb.png" data-image="assets/i/makeup_thumb.png" data-fallback-image="assets/i/makeup_thumb.png?v=2" class="footer__effect-img">
+            </li>
+          </script>
+        </li>
+        <li class="footer__item footer__item_cat">
+          <div class="footer__icon-container"><img src="assets/i/eyes.png" class="footer__icon"></div><span class="footer__name">eyes</span>
+          <script type="template" name="cat-items-2">
+            <li class="footer__item footer__item_effect"><img src="assets/i/makeup_thumb.png" data-image="assets/i/makeup_thumb.png" data-fallback-image="assets/i/makeup_thumb.png?v=2" class="footer__effect-img">
+            </li>
+            <li class="footer__item footer__item_effect"><img src="assets/i/makeup_thumb.png" data-image="assets/i/makeup_thumb.png" data-fallback-image="assets/i/makeup_thumb.png?v=2" class="footer__effect-img">
+            </li>
+          </script>
+        </li>
+        <li class="footer__item footer__item_cat">
+          <div class="footer__icon-container"><img src="assets/i/nose.png" class="footer__icon"></div><span class="footer__name">nose</span>
+          <script type="template" name="cat-items-3">
+            <li class="footer__item footer__item_effect"><img src="assets/i/makeup_thumb.png" data-image="assets/i/makeup_thumb.png" data-fallback-image="assets/i/makeup_thumb.png?v=2" class="footer__effect-img">
+            </li>
+            <li class="footer__item footer__item_effect"><img src="assets/i/makeup_thumb.png" data-image="assets/i/makeup_thumb.png" data-fallback-image="assets/i/makeup_thumb.png?v=2" class="footer__effect-img">
+            </li>
+            <li class="footer__item footer__item_effect"><img src="assets/i/makeup_thumb.png" data-image="assets/i/makeup_thumb.png" data-fallback-image="assets/i/makeup_thumb.png?v=2" class="footer__effect-img">
+            </li>
+            <li class="footer__item footer__item_effect"><img src="assets/i/makeup_thumb.png" data-image="assets/i/makeup_thumb.png" data-fallback-image="assets/i/makeup_thumb.png?v=2" class="footer__effect-img">
+            </li>
+          </script>
+        </li>
+        <li class="footer__item footer__item_cat">
+          <div class="footer__icon-container"><img src="assets/i/chin.png" class="footer__icon"></div><span class="footer__name">chin</span>
+          <script type="template" name="cat-items-4">
+            <li class="footer__item footer__item_effect"><img src="assets/i/makeup_thumb.png" data-image="assets/i/makeup_thumb.png" data-fallback-image="assets/i/makeup_thumb.png?v=2" class="footer__effect-img">
+            </li>
+            <li class="footer__item footer__item_effect"><img src="assets/i/makeup_thumb.png" data-image="assets/i/makeup_thumb.png" data-fallback-image="assets/i/makeup_thumb.png?v=2" class="footer__effect-img">
+            </li>
+          </script>
+        </li>
+        <li class="footer__item footer__item_cat">
+          <div class="footer__icon-container"><img src="assets/i/cheeks.png" class="footer__icon"></div><span class="footer__name">cheeks</span>
+        </li>
+        <li class="footer__item footer__item_cat">
+          <div class="footer__icon-container"><img src="assets/i/lips.png" class="footer__icon"></div><span class="footer__name">lips</span>
+        </li>
+      </ul>
+    </footer>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js" defer></script>
+    <script src="assets/project.js" defer></script>
+  </body>
+</html>
