@@ -124,12 +124,12 @@ gulp.task('server', function() {
   gulp.task('default',['watch', 'jade', 'imagemin', "scripts", "styles", "fonts" ]);
 
 gulp.task('min-files', function() {
-  gulp.src("./out/assets/*.js")
+  gulp.src("./out_min/assets/*.js")
     .pipe(uglify())
-    .pipe(gulp.dest('./out/assets/'))
-  gulp.src("./out/assets/*.css")
+    .pipe(gulp.dest('./out_min/assets/'))
+  gulp.src("./out_min/assets/*.css")
     .pipe(cssmin())
-    .pipe(gulp.dest('./out/assets/'))    
+    .pipe(gulp.dest('./out_min/assets/'))    
 
 });
 
