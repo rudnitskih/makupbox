@@ -113,15 +113,29 @@ gulp.task('server', function() {
     console.log('Сервер работает по адресу http://localhost:8080');
 });
 
- gulp.task('watch', function(){
-      livereload.listen();
+gulp.task('watch', function(){
+    livereload.listen();
 
-      gulp.watch(['src/blocks/**/*.jade', 'src/layouts/*.jade', 'src/*.jade', 'src/data/*.yaml' ] ,['jade']);
-      gulp.watch([ 'src/blocks/**/*.coffee', 'src/assets/scripts/*.coffee' ],['scripts']);
-      gulp.watch([ 'src/blocks/**/*.styl', 'src/assets/styles/*.styl' ],['styles']);
-      gulp.start('server');
-  });
-  gulp.task('default',['watch', 'jade', 'imagemin', "scripts", "styles", "fonts" ]);
+    gulp.watch(['src/blocks/**/*.jade', 'src/layouts/*.jade', 'src/*.jade', 'src/data/*.yaml' ] ,['jade']);
+    gulp.watch([ 'src/blocks/**/*.coffee', 'src/assets/scripts/*.coffee' ],['scripts']);
+    gulp.watch([ 'src/blocks/**/*.styl', 'src/assets/styles/*.styl' ],['styles']);
+    gulp.start('server');
+});
+
+gulp.task('watch', function(){
+    livereload.listen();
+
+    gulp.watch(['src/blocks/**/*.jade', 'src/layouts/*.jade', 'src/*.jade', 'src/data/*.yaml' ] ,['jade']);
+    gulp.watch([ 'src/blocks/**/*.coffee', 'src/assets/scripts/*.coffee' ],['scripts']);
+    gulp.watch([ 'src/blocks/**/*.styl', 'src/assets/styles/*.styl' ],['styles']);
+    gulp.start('server');
+});
+
+gulp.task('generate', ["jade", "imagemin", "scripts", "styles", "fonts" ], function(){
+    return true;
+});
+
+gulp.task('default',[ 'generate', 'watch' ]);
 
 gulp.task('min-files', function() {
   gulp.src("./out_min/assets/*.js")
